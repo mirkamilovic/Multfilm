@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="uz" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#070b11">
+<title>Luxor Cinema</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0b1017; --s1:#121a24; --s2:#1a2431; --line:#263344; --tx:#e8eef6; --mu:#8593a6;
+  --ac:#86c93a; --acink:#0e1a05; --gold:#f0b94a; --blue:#4a9cff; --red:#ff5b6b; --ok:#3ddc97;
+  --r:14px; --tab:62px;
+  --ff:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+}
+[data-theme=light]{
+  --bg:#f2f5f8; --s1:#ffffff; --s2:#e9eff5; --line:#d5dfe9; --tx:#111b26; --mu:#5a6b7e;
+  --ac:#3f9b1a; --acink:#ffffff; --gold:#b9821a;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{background:var(--bg);color:var(--tx);font-family:var(--ff);-webkit-text-size-adjust:100%}
+body{padding-bottom:calc(var(--tab) + env(safe-area-inset-bottom) + 10px);overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+::-webkit-scrollbar{display:none}
+.hidden{display:none!important}
+svg.i{width:1.25em;height:1.25em;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+
+/* ---------- SPLASH ---------- */
+#fxSplash{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .4s}
+#fxSplash.hide{opacity:0;pointer-events:none}
+#fxSplash .logo{font-weight:800;font-size:26px;letter-spacing:.02em}
+#fxSplash .ring{width:32px;height:32px;margin-top:18px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--ac);animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- BRAND + SEARCH ---------- */
+.brand{display:flex;justify-content:center;align-items:center;position:relative;padding:calc(12px + env(safe-area-inset-top)) 14px 8px}
+.logo{display:flex;align-items:center;gap:7px;font-weight:800;font-size:17px;letter-spacing:.01em}
+.logo svg{width:22px;height:22px;fill:var(--ac);stroke:none}
+.logo span{color:var(--ac)}
+.vipb{position:absolute;right:14px;font-size:11px;font-weight:800;padding:6px 11px;border-radius:20px;background:var(--s1);border:1px solid var(--line);color:var(--mu)}
+.vipb.on{background:linear-gradient(90deg,#f6d98a,#caa24a);color:#161200;border-color:transparent}
+.top{position:sticky;top:0;z-index:30;display:flex;gap:10px;padding:6px 14px 10px;background:var(--bg)}
+.ibtn{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--s1);border:1px solid var(--line);flex:none}
+.search{flex:1;display:flex;align-items:center;gap:8px;height:42px;padding:0 12px;border-radius:12px;background:var(--s1);border:1px solid var(--line);color:var(--mu)}
+.search input{flex:1;min-width:0;background:none;border:0;outline:0;font-size:14px;color:var(--tx)}
+.search input::placeholder{color:var(--mu)}
+
+/* ---------- VIEWS ---------- */
+.view{display:none;animation:fade .25s ease}
+.view.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.sec{padding-top:20px}
+.sec-h{display:flex;justify-content:space-between;align-items:center;padding:0 14px 11px}
+.sec-h h2{font-size:18px;font-weight:800;letter-spacing:-.01em}
+.sec-h button{color:var(--ac);font-size:13px;font-weight:700}
+.note{margin:12px 14px 0;padding:11px 13px;border-radius:12px;background:var(--s1);border:1px solid var(--line);font-size:12.5px;color:var(--mu)}
+.gp{font-size:12.5px;color:var(--mu);margin:6px 0 0}
+.lbl{font-size:12px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.06em}
+
+/* ---------- CHIPS / SEGMENT ---------- */
+.chips{display:flex;gap:8px;overflow-x:auto;padding:0 14px 4px;scrollbar-width:none}
+.chip{flex:none;padding:8px 14px;border-radius:99px;border:1px solid var(--line);background:var(--s1);font-size:13px;font-weight:600;color:var(--tx);white-space:nowrap}
+.chip small{color:var(--mu);font-weight:700;margin-left:4px}
+.chip.on{background:var(--ac);border-color:var(--ac);color:var(--acink)}
+.chip.on small{color:var(--acink);opacity:.7}
+.seg{display:inline-flex;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px}
+.seg button{padding:7px 12px;border-radius:9px;font-size:12.5px;font-weight:700;color:var(--mu)}
+.seg button.on{background:var(--ac);color:var(--acink)}
+
+/* ---------- STORIES ---------- */
+.story-tabs{display:flex;justify-content:flex-end;padding:14px 14px 10px}
+.stories{display:flex;gap:12px;overflow-x:auto;padding:0 14px 2px;scrollbar-width:none}
+.st{flex:0 0 66px;text-align:center}
+.st .ring{width:62px;height:62px;border-radius:50%;padding:2.5px;background:conic-gradient(var(--ac),var(--blue),var(--ac));margin:0 auto}
+.st .ring>div{width:100%;height:100%;border-radius:50%;overflow:hidden;border:2px solid var(--bg);position:relative;background:hsl(var(--h) 45% 24%)}
+.st img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.st span.n{display:block;font-size:10.5px;margin-top:5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- HERO ---------- */
+.hero-track{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:0 14px;scrollbar-width:none}
+.slide{flex:0 0 calc(100% - 28px);scroll-snap-align:center;position:relative;height:236px;border-radius:20px;overflow:hidden;border:1px solid var(--line);background:hsl(var(--h) 40% 20%);cursor:pointer}
+.slide img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 22%}
+.slide .fb{position:absolute;inset:0;background:linear-gradient(150deg,hsl(var(--h) 50% 30%),hsl(calc(var(--h) + 40) 45% 12%))}
+.slide::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,rgba(5,9,14,.94),rgba(5,9,14,.1) 68%)}
+.slide .in{position:absolute;z-index:2;left:16px;right:16px;bottom:14px;color:#fff}
+.slide .kick{font-size:10.5px;font-weight:800;letter-spacing:.1em;color:var(--ac);text-transform:uppercase}
+.slide h3{font-size:21px;line-height:1.15;font-weight:800;margin:5px 0 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.slide .row{display:flex;align-items:center;gap:8px}
+.dots{display:flex;gap:6px;justify-content:center;margin-top:11px}
+.dots i{width:6px;height:6px;border-radius:9px;background:var(--line);transition:.25s}
+.dots i.on{width:22px;background:var(--ac)}
+
+/* ---------- BUTTONS ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 18px;border-radius:12px;font-weight:800;font-size:14px;background:var(--ac);color:var(--acink)}
+.btn.gh{background:var(--s2);color:var(--tx);border:1px solid var(--line)}
+.btn.gold{background:linear-gradient(90deg,#f6d98a,#caa24a);color:#161200}
+.btn.sm{height:36px;padding:0 14px;font-size:13px}
+.btn.full{width:100%}
+.btn[disabled]{opacity:.5}
+.btn:active{transform:scale(.97)}
+
+/* ---------- QUICK TILES ---------- */
+.qa{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 14px}
+.qa button{display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 4px 12px;border-radius:16px;background:var(--s1);border:1px solid var(--line);font-size:12px;font-weight:700;text-align:center;line-height:1.2}
+.qa .ico svg{width:22px;height:22px}
+.qa .ico{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:color-mix(in srgb,var(--c) 18%,transparent);color:var(--c)}
+.qa button:active{transform:scale(.96)}
+
+/* ---------- GENRE CIRCLES ---------- */
+.gen-row{display:flex;gap:12px;overflow-x:auto;padding:0 14px 4px;scrollbar-width:none}
+.gen{flex:0 0 68px;text-align:center;font-size:11.5px;color:var(--mu);font-weight:600}
+.gen .g{width:62px;height:62px;border-radius:19px;background:var(--s1);border:1px solid var(--line);display:grid;place-items:center;margin:0 auto 6px;font-size:26px;position:relative}
+.gen.none{opacity:.45}
+.gen .g b{position:absolute;right:-5px;top:-5px;min-width:19px;height:19px;padding:0 5px;border-radius:10px;background:var(--ac);color:var(--acink);font-size:10.5px;font-weight:800;display:grid;place-items:center}
+.gen:active .g{transform:scale(.95)}
+
+/* ---------- POSTER CARDS ---------- */
+.row-h{display:flex;gap:12px;overflow-x:auto;padding:0 14px 4px;scroll-snap-type:x proximity;scrollbar-width:none}
+.row-h .card{flex:0 0 132px;scroll-snap-align:start}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;padding:0 14px}
+.card{position:relative;cursor:pointer;min-width:0}
+.card:active .poster{transform:scale(.97)}
+.poster{position:relative;aspect-ratio:2/3;border-radius:var(--r);overflow:hidden;background:hsl(var(--h) 40% 22%);border:1px solid var(--line);transition:transform .18s}
+.poster img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.poster .fb{position:absolute;inset:0;display:grid;place-items:center;padding:10px;text-align:center;font-weight:800;font-size:13px;color:hsl(var(--h) 80% 90%);background:linear-gradient(160deg,hsl(var(--h) 50% 30%),hsl(calc(var(--h) + 40) 45% 13%))}
+.bq{position:absolute;left:6px;top:6px;display:flex;flex-direction:column;gap:3px;align-items:flex-start;z-index:2}
+.tag{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:6px;background:var(--ac);color:var(--acink);line-height:1.5}
+.tag.new{background:linear-gradient(90deg,#ff5f6d,#ff9d6d);color:#fff}
+.tag.vip{background:linear-gradient(90deg,#f6d98a,#caa24a);color:#161200}
+.tag.price{background:rgba(4,6,10,.7);color:#f6d98a}
+.tag.rate{position:absolute;right:6px;top:6px;z-index:2;background:var(--ac)}
+.ep{position:absolute;left:6px;right:6px;bottom:6px;z-index:2;font-size:10.5px;font-weight:800;text-align:center;padding:3px 6px;border-radius:7px;background:var(--blue);color:#fff}
+.favb{position:absolute;right:6px;bottom:6px;z-index:3;width:30px;height:30px;border-radius:50%;background:rgba(4,6,10,.55);backdrop-filter:blur(6px);color:#fff;font-size:14px;display:grid;place-items:center;transition:transform .2s}
+.favb.on{color:var(--red);transform:scale(1.1)}
+.cm h4{font-size:13px;font-weight:700;margin-top:8px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cm p{display:flex;justify-content:space-between;gap:6px;font-size:11.5px;color:var(--mu);margin-top:3px}
+.cm p span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.more-card{flex:0 0 132px;aspect-ratio:2/3;border-radius:var(--r);border:1.5px dashed var(--line);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--ac);font-size:12px;font-weight:700;text-align:center;padding:8px}
+.empty{grid-column:1/-1;text-align:center;padding:38px 20px;color:var(--mu)}
+.empty .e{font-size:40px}
+.empty p{font-size:14px;font-weight:700;color:var(--tx);margin-top:8px}
+.empty span{font-size:12px;display:block;margin-top:4px}
+.sk{aspect-ratio:2/3;border-radius:var(--r);background:var(--s1);position:relative;overflow:hidden}
+.sk::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.07) 50%,transparent 70%);animation:shim 1.4s infinite}
+@keyframes shim{from{transform:translateX(-100%)}to{transform:translateX(100%)}}
+
+/* ---------- TOP 10 ---------- */
+.t10{display:flex;gap:4px;overflow-x:auto;padding:0 14px 6px;scrollbar-width:none}
+.t10 .it{flex:0 0 152px;position:relative;padding-left:34px}
+.t10 .n{position:absolute;left:0;bottom:46px;font-weight:800;font-size:78px;line-height:1;color:transparent;-webkit-text-stroke:2px var(--ac);letter-spacing:-.06em}
+.t10 .card{width:118px}
+.toprow{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
+.toprow:last-child{border-bottom:0}
+.toprow .rk{font-size:26px;font-weight:800;width:34px;color:transparent;-webkit-text-stroke:1.5px var(--ac)}
+.toprow .th{width:46px;height:64px;border-radius:9px;overflow:hidden;position:relative;background:hsl(var(--h) 40% 22%);flex:none;border:1px solid var(--line)}
+.toprow .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.toprow .in{flex:1;min-width:0}
+.toprow .in b{display:block;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.toprow .in span{font-size:11.5px;color:var(--mu)}
+.toprow .vw{font-size:12px;color:var(--mu);white-space:nowrap}
+
+/* ---------- COLLECTION / GENERIC CARDS ---------- */
+.mon{background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 14px 12px}
+.mon .lbl{margin-bottom:2px}
+.aff{padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;display:flex;justify-content:space-between;gap:10px}
+.aff:last-child{border-bottom:0}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.stat{background:var(--s2);border:1px solid var(--line);border-radius:13px;padding:12px;text-align:center}
+.stat .n{font-size:19px;font-weight:800;color:var(--ac)}
+.stat .l{font-size:11px;color:var(--mu);margin-top:2px}
+.inp{width:100%;padding:12px 13px;border-radius:12px;background:var(--s2);border:1px solid var(--line);color:var(--tx);font-size:13.5px;margin-top:8px;outline:0}
+.inp:focus{border-color:var(--ac)}
+.streak{font-size:30px;font-weight:800;color:var(--ac)}
+
+/* profile head */
+.phead{display:flex;align-items:center;gap:12px;padding:16px 14px}
+.avatar{width:56px;height:56px;border-radius:18px;background:linear-gradient(135deg,var(--ac),#2a7d16);display:grid;place-items:center;font-size:24px;font-weight:800;color:var(--acink)}
+.pname{font-size:16px;font-weight:800}
+.psub{font-size:12px;color:var(--mu);margin-top:2px}
+
+/* shop */
+.plan{display:flex;align-items:center;justify-content:space-between;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:0 14px 10px;gap:10px}
+.plan .t{font-size:14px;font-weight:800}
+.plan .d{font-size:11.5px;color:var(--mu);margin-top:3px}
+.donate{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 14px 6px}
+.donate button{padding:12px 0;border-radius:12px;background:var(--s1);border:1px solid var(--line);color:var(--gold);font-weight:800;font-size:13px}
+.cs{display:flex;gap:12px;align-items:center;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:12px;margin:0 14px 10px}
+.cs .th{width:56px;height:78px;border-radius:10px;overflow:hidden;position:relative;background:hsl(var(--h) 40% 22%);flex:none}
+.cs .th img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cs .in{flex:1;min-width:0}
+.cs .in b{font-size:13.5px}
+.cs .in div{font-size:11px;color:var(--mu);margin-top:2px}
+.prod{display:flex;align-items:center;gap:12px;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:14px;margin:0 14px 10px}
+.prod .em{font-size:26px;width:46px;height:46px;border-radius:13px;background:var(--s2);display:grid;place-items:center;flex:none}
+.prod .in{flex:1;min-width:0}
+.prod .in b{font-size:14px}
+.prod .in div{font-size:11.5px;color:var(--mu);margin-top:2px}
+.prod .pr{font-size:13px;font-weight:800;color:var(--gold);margin-top:4px}
+
+/* genre subscribe / achievements / continue */
+.gsub{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.gsub button{padding:7px 12px;border-radius:16px;background:var(--s2);border:1px solid var(--line);color:var(--mu);font-size:12px;font-weight:700}
+.gsub button.on{background:var(--ac);color:var(--acink);border-color:var(--ac)}
+.achv{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.achv div{background:var(--s2);border-radius:12px;padding:10px;text-align:center;opacity:.4}
+.achv div.earned{opacity:1;border:1px solid var(--ac)}
+.achv .e{font-size:22px}.achv .t{font-size:10.5px;font-weight:700;margin-top:4px}
+.cont{display:flex;gap:10px;overflow-x:auto;margin-top:8px}
+.cont .cc{flex:0 0 140px;background:var(--s2);border-radius:13px;overflow:hidden;border:1px solid var(--line);cursor:pointer}
+.cont .cc .ph{height:80px;position:relative;background:hsl(var(--h) 40% 22%)}
+.cont .cc .ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cont .cc .b{padding:8px 9px}.cont .cc .b b{font-size:11.5px;display:block;line-height:1.2}.cont .cc .b span{font-size:10.5px;color:var(--ac);font-weight:700}
+.refl{display:flex;align-items:center;gap:8px;background:var(--s2);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-top:10px;font-size:12px;color:var(--mu);word-break:break-all}
+.pr-row{display:flex;gap:8px;margin-top:10px}
+.pr-row .inp{margin-top:0;text-transform:uppercase}
+
+/* ---------- BOTTOM NAV ---------- */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:50;display:grid;grid-template-columns:repeat(7,1fr);background:color-mix(in srgb,var(--bg) 92%,transparent);backdrop-filter:blur(16px);border-top:1px solid var(--line);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+.nav button{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 0;font-size:9.5px;font-weight:700;color:var(--mu);border-radius:12px;min-width:0;white-space:nowrap}
+.nav svg.i{width:21px;height:21px}
+.nav button.on{color:var(--ac)}
+
+/* ---------- DRAWER ---------- */
+.ov{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.55);opacity:0;pointer-events:none;transition:opacity .2s}
+.ov.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;bottom:0;left:0;width:min(84vw,330px);z-index:61;background:var(--s1);border-right:1px solid var(--line);transform:translateX(-103%);transition:transform .25s ease;overflow-y:auto;padding:calc(14px + env(safe-area-inset-top)) 12px calc(24px + env(safe-area-inset-bottom))}
+.drawer.on{transform:none}
+.dh{display:flex;justify-content:space-between;align-items:center;padding:4px 6px 12px}
+.dl{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border-radius:12px;font-weight:600;font-size:14.5px;text-align:left}
+.dl.on{background:color-mix(in srgb,var(--ac) 16%,transparent);color:var(--ac)}
+.dl .chev{margin-left:auto;transition:transform .2s}
+.acc.open .chev{transform:rotate(180deg)}
+.dsub{display:none;padding:2px 0 8px}
+.acc.open .dsub{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dsub button{padding:9px 10px;border-radius:10px;background:var(--s2);border:1px solid var(--line);font-size:12.5px;font-weight:600;text-align:left}
+.dsep{height:1px;background:var(--line);margin:8px 4px}
+
+/* ---------- SHEET (detail / genres) ---------- */
+.sheet{position:fixed;inset:0;z-index:80;background:var(--bg);overflow-y:auto;transform:translateY(102%);transition:transform .28s cubic-bezier(.2,.8,.2,1);visibility:hidden}
+.sheet.on{transform:none;visibility:visible}
+.dhero{position:relative;height:330px;overflow:hidden;background:hsl(var(--h) 40% 18%)}
+.dhero .bgi{position:absolute;inset:-24px;width:calc(100% + 48px);height:calc(100% + 48px);object-fit:cover;filter:blur(26px) brightness(.55)}
+.dhero::after{content:'';position:absolute;inset:0;background:linear-gradient(0deg,var(--bg) 0%,transparent 55%)}
+.dhero .pp{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);width:172px;z-index:2}
+.dhero .pp .poster{box-shadow:0 14px 34px rgba(0,0,0,.5)}
+.dback{position:absolute;left:12px;top:calc(12px + env(safe-area-inset-top));z-index:5;background:rgba(6,10,15,.55);backdrop-filter:blur(8px);color:#fff;border-color:transparent}
+.dbody{padding:14px 16px calc(28px + env(safe-area-inset-bottom))}
+.dbody h1{font-size:22px;font-weight:800;line-height:1.2;text-align:center}
+.dmeta{display:flex;justify-content:center;flex-wrap:wrap;gap:8px 14px;margin-top:10px;font-size:12.5px;color:var(--mu);font-weight:600}
+.dmeta span{display:inline-flex;align-items:center;gap:5px}
+.dgen{display:flex;justify-content:center;flex-wrap:wrap;gap:7px;margin-top:12px}
+.dgen button{padding:6px 12px;border-radius:99px;background:var(--s1);border:1px solid var(--line);font-size:12px;font-weight:700}
+.ddesc{margin-top:14px;font-size:13.5px;line-height:1.55;color:var(--mu)}
+.dact{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.dact .btn{height:48px;font-size:13.5px;padding:0 10px}
+.dact2{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.dact2 button{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 2px;border-radius:12px;background:var(--s1);border:1px solid var(--line);font-size:11px;font-weight:700}
+.dact2 button.on{color:var(--red);border-color:var(--red)}
+.stars{display:flex;justify-content:center;gap:6px;margin-top:12px}
+.stars button{font-size:26px;color:var(--line);line-height:1}
+.stars button.on{color:var(--gold)}
+.eps{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:10px}
+.eps button{padding:11px 0;border-radius:10px;background:var(--s1);border:1px solid var(--line);color:var(--ac);font-weight:800;font-size:12.5px}
+.eps button:active{transform:scale(.94)}
+.epgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.epitem{display:flex;align-items:center;gap:2px;background:var(--s1);border:1px solid var(--line);border-radius:10px;padding:2px 2px 2px 12px}
+.epitem .epplay{flex:1;background:none;border:none;color:var(--ac);font-weight:800;font-size:12.5px;text-align:left;padding:10px 0}
+.epitem .epsend{background:none;border:none;color:var(--mu);padding:10px;border-radius:8px;display:flex;align-items:center}
+.epitem .epsend:active{background:var(--line)}
+.cmt{margin-top:14px;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:12px}
+.cmt-row{background:var(--s2);border-radius:10px;padding:8px 10px;margin-top:8px}
+.cmt-row b{font-size:11.5px;color:var(--ac)}
+.cmt-row p{font-size:12.5px;margin-top:2px;line-height:1.35}
+.cmt-in{display:flex;gap:8px;margin-top:10px}
+.cmt-in .inp{margin-top:0}
+.cmt-in button{width:44px;border-radius:10px;background:var(--ac);color:var(--acink);font-weight:800}
+
+/* genre sheet */
+.gs-h{display:flex;justify-content:space-between;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 14px 6px}
+.gs-h h2{font-size:20px;font-weight:800}
+.gs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:10px 14px calc(30px + env(safe-area-inset-bottom))}
+.gs-grid button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 4px 12px;border-radius:16px;background:var(--s1);border:1px solid var(--line);font-size:12.5px;font-weight:700;text-align:center}
+.gs-grid button .em{font-size:28px}
+.gs-grid button small{font-size:11px;color:var(--mu);font-weight:600}
+.gs-grid button.has small{color:var(--ac)}
+.gs-grid button.on{border-color:var(--ac);background:color-mix(in srgb,var(--ac) 14%,var(--s1))}
+
+/* modal (player / roulette) */
+.modal{position:fixed;inset:0;z-index:100;background:rgba(3,6,10,.88);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;padding:16px}
+.modal.on{display:flex}
+.mbox{width:100%;max-width:480px;background:var(--s1);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;font-weight:800;font-size:14px}
+.mh button{color:var(--mu);font-size:13px;font-weight:700}
+.mbox video{width:100%;max-height:70vh;background:#000;display:block}
+.rl{padding:8px 16px 18px;text-align:center}
+.rl .rt{font-size:20px;font-weight:800;min-height:56px;display:grid;place-items:center;line-height:1.2}
+.rl .rg{font-size:13px;color:var(--mu);min-height:20px}
+
+/* fab + toast */
+.fab{position:fixed;right:14px;bottom:calc(var(--tab) + 18px + env(safe-area-inset-bottom));z-index:35;width:46px;height:46px;border-radius:50%;background:var(--ac);color:var(--acink);display:none;place-items:center;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.fab.on{display:grid}
+#fxToast{position:fixed;left:50%;bottom:calc(var(--tab) + 24px + env(safe-area-inset-bottom));transform:translate(-50%,20px);background:var(--tx);color:var(--bg);padding:11px 16px;border-radius:12px;font-weight:700;font-size:13.5px;opacity:0;transition:.25s;z-index:120;max-width:88vw;text-align:center;pointer-events:none}
+#fxToast.show{opacity:1;transform:translate(-50%,0)}
+#fxToast.err{background:var(--red);color:#fff}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* =====================================================================
+   MODERN THEME — zamonaviy ko'rinish (shisha effekt, gradient, suzuvchi menyu)
+   ===================================================================== */
+:root{
+  --bg:#070b11; --s1:#101824; --s2:#172131; --line:#1f2b3c; --tx:#eaf0f8; --mu:#8794a8;
+  --ac:#a3e635; --acink:#0b1403;
+  --grad:linear-gradient(135deg,#b7f24b 0%,#46d18a 100%);
+  --glow:0 8px 22px -6px rgba(163,230,53,.45);
+  --shadow:0 12px 30px -14px rgba(0,0,0,.75);
+  --r:18px; --tab:80px;
+}
+[data-theme=light]{
+  --bg:#f3f6fb; --s1:#ffffff; --s2:#ebf0f7; --line:#dbe3ee; --tx:#101a28; --mu:#5b6b80;
+  --ac:#3f9d12; --acink:#ffffff;
+  --grad:linear-gradient(135deg,#5ec41c 0%,#1ea66a 100%);
+  --glow:0 8px 20px -6px rgba(46,160,40,.45);
+  --shadow:0 10px 26px -16px rgba(30,50,80,.35);
+}
+html,body{background:var(--bg)}
+body{
+  background:
+    radial-gradient(520px 300px at 92% -40px,color-mix(in srgb,var(--ac) 16%,transparent),transparent 70%),
+    radial-gradient(480px 300px at -8% 120px,rgba(74,156,255,.12),transparent 70%),
+    var(--bg);
+  background-attachment:fixed;
+}
+[data-theme=light] body{
+  background:
+    radial-gradient(520px 300px at 92% -40px,rgba(94,196,28,.14),transparent 70%),
+    radial-gradient(480px 300px at -8% 120px,rgba(74,156,255,.10),transparent 70%),
+    var(--bg);
+  background-attachment:fixed;
+}
+
+/* splash */
+#fxSplash .logo{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:30px;letter-spacing:.12em;animation:pulse 1.4s ease-in-out infinite}
+#fxSplash .ring{border-top-color:var(--ac);box-shadow:0 0 18px color-mix(in srgb,var(--ac) 40%,transparent)}
+@keyframes pulse{50%{opacity:.55;transform:scale(.98)}}
+
+/* brand + top bar */
+.logo{font-size:18px;letter-spacing:.08em}
+.logo svg{filter:drop-shadow(0 0 8px color-mix(in srgb,var(--ac) 70%,transparent))}
+.logo span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.vipb{border-radius:99px;padding:6px 12px;backdrop-filter:blur(8px);background:color-mix(in srgb,var(--s1) 80%,transparent)}
+.vipb.on{box-shadow:0 6px 18px -6px rgba(246,217,138,.6)}
+.top{background:color-mix(in srgb,var(--bg) 72%,transparent);backdrop-filter:blur(16px) saturate(1.3);-webkit-backdrop-filter:blur(16px) saturate(1.3)}
+.ibtn,.search{height:46px;border-radius:16px;background:color-mix(in srgb,var(--s1) 88%,transparent);box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s}
+.ibtn{width:46px}
+.search:focus-within{border-color:var(--ac);box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 16%,transparent)}
+.search input{font-size:14.5px}
+
+/* section headings */
+.sec{padding-top:24px}
+.sec-h h2{display:flex;align-items:center;gap:9px;font-size:19px;letter-spacing:-.02em}
+.sec-h h2::before{content:'';width:4px;height:19px;border-radius:4px;background:var(--grad);box-shadow:0 0 12px color-mix(in srgb,var(--ac) 55%,transparent)}
+.sec-h>button{padding:6px 13px;border-radius:99px;background:color-mix(in srgb,var(--ac) 13%,transparent);font-size:12.5px}
+.lbl{letter-spacing:.09em}
+
+/* chips + segments */
+.chip{border-radius:99px;padding:9px 15px;background:var(--s1);transition:transform .15s,background .2s}
+.chip:active{transform:scale(.95)}
+.chip.on{background:var(--grad);border-color:transparent;box-shadow:var(--glow)}
+.seg{border-radius:16px;padding:4px;background:var(--s1)}
+.seg button{border-radius:12px;padding:8px 14px;transition:background .2s}
+.seg button.on{background:var(--grad);box-shadow:var(--glow)}
+
+/* stories */
+.st .ring{box-shadow:0 0 16px -2px color-mix(in srgb,var(--ac) 50%,transparent);background:conic-gradient(from 200deg,var(--ac),var(--blue),#c084fc,var(--ac))}
+
+/* hero */
+.slide{height:252px;border-radius:26px;box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--line) 70%,transparent)}
+.slide::after{background:linear-gradient(0deg,rgba(4,8,13,.96) 0%,rgba(4,8,13,.55) 38%,rgba(4,8,13,0) 72%)}
+.slide .in{left:18px;right:18px;bottom:16px}
+.slide .kick{display:inline-block;padding:4px 10px;border-radius:99px;background:rgba(163,230,53,.18);backdrop-filter:blur(8px);color:#d4f78c;border:1px solid rgba(163,230,53,.28)}
+.slide h3{font-size:24px;letter-spacing:-.02em;margin:9px 0 12px;text-shadow:0 2px 14px rgba(0,0,0,.5)}
+.dots i.on{background:var(--grad);box-shadow:0 0 10px color-mix(in srgb,var(--ac) 60%,transparent)}
+
+/* buttons */
+.btn{height:46px;border-radius:15px;background:var(--grad);box-shadow:var(--glow);letter-spacing:.01em;transition:transform .15s,box-shadow .2s}
+.btn.sm{height:38px;border-radius:12px}
+.btn.gh{background:var(--s2);box-shadow:none;border-color:var(--line)}
+.btn.gold{box-shadow:0 8px 22px -6px rgba(240,185,74,.5)}
+.btn:active{transform:scale(.96)}
+
+/* quick tiles */
+.qa{gap:11px}
+.qa button{border-radius:22px;padding:15px 4px 13px;background:linear-gradient(165deg,var(--s1),color-mix(in srgb,var(--s1) 70%,var(--s2)));box-shadow:var(--shadow);transition:transform .15s}
+.qa .ico{width:46px;height:46px;border-radius:15px;background:linear-gradient(140deg,color-mix(in srgb,var(--c) 32%,transparent),color-mix(in srgb,var(--c) 8%,transparent));box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 32%,transparent),0 6px 16px -8px var(--c)}
+.qa .ico svg{width:23px;height:23px}
+
+/* genre circles */
+.gen .g{border-radius:22px;width:64px;height:64px;background:linear-gradient(165deg,var(--s1),var(--s2));box-shadow:var(--shadow)}
+.gen .g b{background:var(--grad);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+
+/* posters / cards */
+.poster{border-radius:var(--r);box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--line) 60%,transparent)}
+.poster::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(0,0,0,.30) 0%,transparent 30%,transparent 60%,rgba(0,0,0,.55) 100%)}
+.bq,.tag.rate,.ep,.favb{z-index:2}
+.tag{border-radius:8px;box-shadow:0 3px 10px rgba(0,0,0,.35)}
+.tag.price{background:rgba(6,9,14,.62);backdrop-filter:blur(8px)}
+.tag.rate{background:rgba(6,9,14,.62);backdrop-filter:blur(8px);color:#ffd166}
+.ep{background:rgba(74,156,255,.82);backdrop-filter:blur(8px);border-radius:9px;bottom:7px;left:7px;right:44px;text-align:left}
+.favb{width:32px;height:32px;background:rgba(6,9,14,.5);border:1px solid rgba(255,255,255,.12)}
+.favb.on{background:rgba(255,91,107,.22);border-color:rgba(255,91,107,.5)}
+.cm h4{font-size:13px;letter-spacing:-.005em}
+.more-card{border-radius:var(--r);background:color-mix(in srgb,var(--ac) 7%,transparent);border-color:color-mix(in srgb,var(--ac) 40%,transparent)}
+.grid .card,.row-h .card{animation:rise .5s cubic-bezier(.2,.8,.2,1) both}
+.grid .card:nth-child(2),.row-h .card:nth-child(2){animation-delay:.04s}
+.grid .card:nth-child(3),.row-h .card:nth-child(3){animation-delay:.08s}
+.grid .card:nth-child(4),.row-h .card:nth-child(4){animation-delay:.12s}
+.grid .card:nth-child(5),.row-h .card:nth-child(5){animation-delay:.16s}
+.grid .card:nth-child(n+6),.row-h .card:nth-child(n+6){animation-delay:.2s}
+@keyframes rise{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.sk{border-radius:var(--r)}
+
+/* TOP 10 */
+.t10 .n{-webkit-text-stroke:2px var(--ac);filter:drop-shadow(0 0 12px color-mix(in srgb,var(--ac) 45%,transparent))}
+.toprow .rk{-webkit-text-stroke:1.5px var(--ac)}
+.toprow .th{border-radius:12px}
+
+/* panels */
+.mon,.plan,.prod,.cs,.cmt{border-radius:22px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04),var(--shadow)}
+.stat{border-radius:16px;background:linear-gradient(165deg,var(--s2),color-mix(in srgb,var(--s2) 70%,var(--s1)))}
+.stat .n{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;font-size:21px}
+.inp{border-radius:15px;transition:border-color .2s,box-shadow .2s}
+.inp:focus{box-shadow:0 0 0 4px color-mix(in srgb,var(--ac) 16%,transparent)}
+.avatar{border-radius:22px;width:60px;height:60px;background:var(--grad);box-shadow:var(--glow)}
+.streak{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.gsub button{border-radius:99px}
+.gsub button.on{background:var(--grad);border-color:transparent;box-shadow:var(--glow)}
+.achv div{border-radius:14px}
+.achv div.earned{border-color:var(--ac);box-shadow:0 0 16px -6px var(--ac)}
+.donate button{border-radius:15px;background:linear-gradient(165deg,var(--s1),var(--s2))}
+.note{border-radius:16px}
+
+/* floating bottom navigation */
+.nav{left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom));border:1px solid color-mix(in srgb,var(--line) 85%,transparent);border-radius:26px;padding:6px;
+  background:color-mix(in srgb,var(--s1) 78%,transparent);backdrop-filter:blur(22px) saturate(1.5);-webkit-backdrop-filter:blur(22px) saturate(1.5);
+  box-shadow:0 18px 44px -12px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.05)}
+[data-theme=light] .nav{box-shadow:0 14px 34px -12px rgba(30,50,80,.35)}
+.nav button{position:relative;border-radius:20px;padding:8px 0 7px;transition:color .2s,background .25s,transform .15s}
+.nav button:active{transform:scale(.92)}
+.nav button.on{color:var(--ac);background:color-mix(in srgb,var(--ac) 15%,transparent)}
+.nav button.on svg{transform:translateY(-1px) scale(1.08);filter:drop-shadow(0 0 7px color-mix(in srgb,var(--ac) 65%,transparent))}
+.nav button svg{transition:transform .2s,filter .2s}
+.fab{background:var(--grad);box-shadow:var(--glow);bottom:calc(var(--tab) + 14px + env(safe-area-inset-bottom))}
+
+/* drawer */
+.drawer{border-radius:0 28px 28px 0;background:color-mix(in srgb,var(--s1) 94%,transparent);backdrop-filter:blur(20px);box-shadow:20px 0 60px -20px rgba(0,0,0,.7)}
+.dl{border-radius:16px;transition:background .2s}
+.dl.on,.dl:active{background:color-mix(in srgb,var(--ac) 14%,transparent)}
+.dsub button{border-radius:12px}
+
+/* detail sheet */
+.dhero .pp .poster{border-radius:22px;box-shadow:0 22px 50px -12px rgba(0,0,0,.75)}
+.dback{background:rgba(6,10,15,.5);border:1px solid rgba(255,255,255,.14)}
+.dbody h1{font-size:24px;letter-spacing:-.02em}
+.dgen button{background:color-mix(in srgb,var(--ac) 11%,var(--s1));border-color:color-mix(in srgb,var(--ac) 28%,var(--line))}
+.dact2 button{border-radius:18px;background:linear-gradient(165deg,var(--s1),var(--s2));box-shadow:var(--shadow)}
+.eps button,.epitem{border-radius:13px}
+.stars button.on{filter:drop-shadow(0 0 8px rgba(240,185,74,.7))}
+.gs-grid button{border-radius:20px;box-shadow:var(--shadow)}
+.gs-grid button.on{box-shadow:0 0 0 1px var(--ac),var(--glow)}
+
+/* modal + toast */
+.modal{backdrop-filter:blur(10px)}
+.mbox{border-radius:24px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
+#fxToast{background:color-mix(in srgb,var(--s1) 92%,transparent);color:var(--tx);border:1px solid var(--line);backdrop-filter:blur(14px);border-radius:16px;box-shadow:0 14px 36px -10px rgba(0,0,0,.7);bottom:calc(var(--tab) + 22px + env(safe-area-inset-bottom))}
+#fxToast.err{background:rgba(255,91,107,.92);color:#fff;border-color:transparent}
+</style>
+</head>
+<body>
+
+<div id="fxSplash"><div class="logo">LUXOR CINEMA</div><div class="ring"></div></div>
+
+<div class="brand">
+  <div class="logo"><svg viewBox="0 0 24 24"><path d="M4 3.5v17a1 1 0 0 0 1.5.86l14-8.5a1 1 0 0 0 0-1.72l-14-8.5A1 1 0 0 0 4 3.5z"/></svg>LUXOR <span>CINEMA</span></div>
+  <div class="vipb" id="vipBadge">Oddiy</div>
+</div>
+<div class="top">
+  <button class="ibtn" data-act="drawer" aria-label="Menyu" id="btnMenu"></button>
+  <label class="search"><span id="icSearch"></span><input id="q" type="search" placeholder="Kino yoki serial qidirish..." autocomplete="off"></label>
+</div>
+
+<main>
+  <section class="view on" id="v-home"></section>
+  <section class="view" id="v-movies"></section>
+  <section class="view" id="v-series"></section>
+  <section class="view" id="v-dorama"></section>
+  <section class="view" id="v-anime"></section>
+  <section class="view" id="v-search"></section>
+  <section class="view" id="v-top"></section>
+  <section class="view" id="v-shop"></section>
+  <section class="view" id="v-fav"></section>
+  <section class="view" id="v-profile"></section>
+  <section class="view" id="v-admin"></section>
+</main>
+
+<nav class="nav" id="nav"></nav>
+<button class="fab" id="fab" data-act="up" aria-label="Tepaga"></button>
+
+<div class="ov" id="ovDrawer" data-act="closeDrawer"></div>
+<aside class="drawer" id="drawer"></aside>
+
+<div class="sheet" id="sheet"></div>
+<div class="sheet" id="gsheet"></div>
+<div class="modal" id="modal"></div>
+<div id="fxToast"></div>
+
+<script>
+var tg = window.Telegram ? window.Telegram.WebApp : null;
+if (tg) { try { tg.ready(); tg.expand(); } catch(e){} }
+
+/* ====================================================== YORDAMCHILAR */
+function $(i){ return document.getElementById(i); }
+function esc(s){ return (s==null?"":String(s)).replace(/[&<>"']/g,function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
+function hap(t){ try{ if(tg&&tg.HapticFeedback) tg.HapticFeedback.impactOccurred(t||"light"); }catch(e){} }
+function hue(s){ var h=0; s=String(s||""); for(var i=0;i<s.length;i++) h=(h*31+s.charCodeAt(i))%360; return h; }
+function fmtN(n){ n=+n||0; return n>=1e6?(n/1e6).toFixed(1).replace(".0","")+"M":n>=1e3?(n/1e3).toFixed(1).replace(".0","")+"K":String(n); }
+function firstGenre(g){ return String(g||"").split(",")[0].trim(); }
+function genresOf(g){ return String(g||"").split(",").map(function(x){return x.trim();}).filter(Boolean); }
+var store={ get:function(k,d){ try{ var v=localStorage.getItem("fx_"+k); return v?JSON.parse(v):d; }catch(e){ return d; } },
+            set:function(k,v){ try{ localStorage.setItem("fx_"+k,JSON.stringify(v)); }catch(e){} } };
+var toastTimer;
+function toast(msg,type){ var el=$("fxToast"); el.textContent=msg; el.className="show"+(type==="err"?" err":""); clearTimeout(toastTimer); toastTimer=setTimeout(function(){ el.className=""; },2400); }
+function api(path,body){
+  return fetch(path,{method:"POST",headers:{"Content-Type":"application/json","X-Init-Data":tg?tg.initData:""},body:JSON.stringify(body||{})})
+    .then(function(r){ return r.json(); }).catch(function(){ return {ok:false}; });
+}
+window.__api=api; window.__toast=toast; window.__esc=esc;
+function isRecent(a){ if(!a) return false; var t=Date.parse(String(a).replace(" ","T")+"Z"); if(isNaN(t)) t=Date.parse(a); if(isNaN(t)) return false; return (Date.now()-t)<3*864e5; }
+
+var IC={
+ menu:'<path d="M4 6h16M4 12h16M4 18h16"/>', close:'<path d="M6 6l12 12M18 6 6 18"/>',
+ search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+ home:'<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>',
+ film:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 3v18M17 3v18M3 8h4M3 16h4M17 8h4M17 16h4"/>',
+ tv:'<rect x="3" y="6" width="18" height="12" rx="2"/><path d="M8 21h8"/>',
+ user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',
+ heart:'<path d="M12 21s-8-5.2-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 5.8-8 11-8 11z"/>',
+ dice:'<rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8.5 8.5h.01M15.5 8.5h.01M8.5 15.5h.01M15.5 15.5h.01M12 12h.01"/>',
+ trophy:'<path d="M8 4h8v5a4 4 0 0 1-8 0zM8 6H4v1a4 4 0 0 0 4 4M16 6h4v1a4 4 0 0 1-4 4M12 13v4M8 21h8M10 17h4"/>',
+ crown:'<path d="M3 8l4 4 5-7 5 7 4-4-2 11H5z"/>',
+ gift:'<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v8h14v-8M12 8c-3 0-5-1-5-3s3-2 5 3c2-5 5-5 5-3s-2 3-5 3z"/>',
+ users:'<circle cx="9" cy="8" r="3.5"/><path d="M2 20c0-3.5 3-5.5 7-5.5s7 2 7 5.5M17 5a3.5 3.5 0 0 1 0 6.5M22 20c0-3-2-4.8-5-5.3"/>',
+ grid:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+ clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+ back:'<path d="M15 5l-7 7 7 7"/>', chev:'<path d="m6 9 6 6 6-6"/>', up:'<path d="M12 19V5M5 12l7-7 7 7"/>',
+ sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5 19 19M5 19l1.5-1.5M17.5 6.5 19 5"/>',
+ moon:'<path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z"/>',
+ play:'<path d="M8 5v14l11-7z"/>', send:'<path d="M21 4 3 11l6 2 2 6z"/><path d="m9 13 12-9"/>',
+ share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6"/>',
+ chat:'<path d="M4 5h16v11H9l-5 4z"/>', star:'<path d="m12 3 2.8 5.8 6.2.9-4.5 4.4 1.1 6.2L12 17.3 6.4 20.3l1.1-6.2L3 9.7l6.2-.9z"/>',
+ mail:'<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/>',
+ tool:'<path d="M14.5 6.5a4 4 0 0 0-5 5L3 18l3 3 6.5-6.5a4 4 0 0 0 5-5l-2.5 2.5-2.5-.5-.5-2.5z"/>',
+ tag:'<path d="M3 12V4h8l10 10-8 8z"/><path d="M7.5 8h.01"/>',
+ dorama:'<path d="M4 4h9v7a4.5 4.5 0 0 1-9 0z"/><path d="M7 8h.01M10 8h.01M7.2 12c.9.9 2.7.9 3.6 0"/><path d="M15 9h5v6a4 4 0 0 1-6.5 3"/>',
+ anime:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>'
+};
+function ic(n,extra){ return '<svg class="i" viewBox="0 0 24 24"'+(extra||"")+'>'+(IC[n]||"")+'</svg>'; }
+
+/* ====================================================== HOLAT */
+var FALLBACK_GENRES=["Jangari","Komediya","Drama","Melodrama","Triller","Qo'rqinchli","Fantastika","Fantezi","Sarguzasht","Detektiv","Kriminal","Tarixiy","Harbiy","Oilaviy","Multfilm","Anime","Hujjatli","Hayotiy","Musiqiy","Sport","Vester","Klassika","Afsona","Biografiya","Dorama"];
+var S={
+  view:"home", movies:[], series:[], top:[], soon:[], soonWaiting:{},
+  gen:{list:FALLBACK_GENRES, icons:{}, counts:{}, sc:{}, sub:[]},
+  fav:{}, me:{}, bot:"", cache:{}, storyTab:"random", shuf:null, demo:false,
+  cat:{ movies:{genre:"",sort:"new",items:[],more:false,busy:false,off:0},
+        series:{genre:"",sort:"new",items:[],more:false,busy:false,off:0} },
+  q:"", theme:store.get("theme","dark"), sheet:null, heroTimer:null, lastLoad:0
+};
+var PAGE=24;
+var VIP_PLANS=[
+  {id:"vip_7", label:"7 kunlik VIP", desc:"Reklamasiz + eksklyuziv kinolar", stars:149},
+  {id:"vip_30",label:"30 kunlik VIP",desc:"Eng foydali tarif",               stars:399}
+];
+var DONATE_OPTIONS=[20,50,100,300];
+var SELLER_FALLBACK="Mirkamilovic";
+
+function gIcon(n){ return (S.gen.icons&&S.gen.icons[n])||"🎬"; }
+function remember(list,kind){ (list||[]).forEach(function(m){ S.cache[kind+":"+m.code]=m; }); }
+
+/* ====================================================== KARTALAR */
+function posterInner(m){
+  return '<span class="fb">'+esc(m.title)+'</span>'+(m.poster_url?'<img loading="lazy" alt="" src="'+esc(m.poster_url)+'" onerror="this.remove()">':'');
+}
+function cardHTML(m,kind){
+  var b="";
+  if(isRecent(m.added_at)) b+='<span class="tag new">YANGI</span>';
+  if(m.is_vip) b+='<span class="tag vip">VIP</span>'; else if(m.price_stars) b+='<span class="tag price">⭐ '+m.price_stars+'</span>';
+  var rate=(kind==="movie"&&m.rating_count>0)?'<span class="tag rate">★ '+m.avg_rating+'</span>':"";
+  var ep=kind==="series"?'<span class="ep">'+(m.episode_count||0)+' qism</span>':"";
+  var fav=kind==="movie"?'<button class="favb'+(S.fav[m.code]?" on":"")+'" data-fav="'+esc(m.code)+'" aria-label="Sevimli">♥</button>':"";
+  var meta=kind==="movie"?'<span>'+esc(firstGenre(m.genre)||"Kino")+'</span><span>👁 '+fmtN(m.views)+'</span>':'<span>'+esc(firstGenre(m.genre)||"Serial")+'</span><span>Serial</span>';
+  return '<div class="card" role="button" tabindex="0" data-open="'+esc(m.code)+'" data-kind="'+kind+'"><div class="poster" style="--h:'+hue(m.title)+'">'+posterInner(m)+'<div class="bq">'+b+'</div>'+rate+ep+fav+'</div><div class="cm"><h4>'+esc(m.title)+'</h4><p>'+meta+'</p></div></div>';
+}
+function rowHTML(title,list,kind,more){
+  if(!list||!list.length) return "";
+  return '<section class="sec"><div class="sec-h"><h2>'+title+'</h2>'+(more?'<button data-act="'+more[0]+'" data-arg="'+esc(more[1]||"")+'">Barchasi</button>':"")+'</div><div class="row-h">'+list.map(function(m){return cardHTML(m,kind);}).join("")+
+    (more?'<button class="more-card" data-act="'+more[0]+'" data-arg="'+esc(more[1]||"")+'">'+ic("grid")+'Barchasini ko\'rish</button>':"")+'</div></section>';
+}
+function skelHTML(n){ var o=""; for(var i=0;i<(n||6);i++) o+='<div class="sk"></div>'; return o; }
+
+/* ====================================================== NAVIGATSIYA */
+var NAV=[["home","Bosh","home"],["movies","Kinolar","film"],["series","Seriallar","tv"],["dorama","Dorama","dorama"],["anime","Anime","anime"],["search","Qidiruv","search"],["profile","Profil","user"]];
+function buildNav(){
+  $("nav").innerHTML=NAV.map(function(n){ return '<button data-act="go" data-arg="'+n[0]+'" data-nav="'+n[0]+'">'+ic(n[2])+n[1]+'</button>'; }).join("");
+}
+function navFor(v){ return {home:"home",movies:"movies",search:"search",series:"series",dorama:"dorama",anime:"anime",profile:"profile",fav:"profile",top:"home",shop:"profile",admin:"profile"}[v]; }
+function go(v,opt){
+  opt=opt||{};
+  closeSheets(true); closeDrawer(); closeModal();
+  S.view=v;
+  document.querySelectorAll(".view").forEach(function(e){ e.classList.remove("on"); });
+  $("v-"+v).classList.add("on");
+  var nv=navFor(v);
+  document.querySelectorAll("#nav button").forEach(function(b){ b.classList.toggle("on",b.dataset.nav===nv); });
+  if(v!=="search"&&$("q").value){ $("q").value=""; S.q=""; S.cat.movies.q=""; S.cat.series.q=""; S.sec.dorama.q=""; S.sec.anime.q=""; }
+  setPh(v);
+  ({home:renderHome,movies:function(){renderCatalog("movies");},series:function(){renderCatalog("series");},dorama:function(){renderSection("dorama");},anime:function(){renderSection("anime");},search:renderSearch,top:renderTop,shop:renderShop,fav:renderFav,profile:renderProfile,admin:renderAdmin})[v]();
+  if(!opt.keepScroll) window.scrollTo(0,0);
+  syncBack();
+}
+function syncBack(){
+  if(!tg||!tg.BackButton) return;
+  var need=S.sheet||$("drawer").classList.contains("on")||$("modal").classList.contains("on")||S.view!=="home";
+  try{ need?tg.BackButton.show():tg.BackButton.hide(); }catch(e){}
+}
+if(tg&&tg.BackButton){ try{ tg.BackButton.onClick(function(){
+  if($("modal").classList.contains("on")) closeModal();
+  else if(S.sheet) closeSheets();
+  else if($("drawer").classList.contains("on")) closeDrawer();
+  else go("home");
+}); }catch(e){} }
+window.goView=function(v){ var m={Home:"home",Top:"top",Series:"series",Shop:"shop",Profile:"profile",Admin:"admin"}; go(m[v]||v); };
+
+/* ====================================================== YON MENYU (drawer) */
+function buildDrawer(){
+  var gens=S.gen.list.map(function(g){ return '<button data-act="genre" data-arg="'+esc(g)+'">'+gIcon(g)+' '+esc(g)+'</button>'; }).join("");
+  var admin=S.me.is_admin?'<button class="dl" data-act="go" data-arg="admin">'+ic("tool")+'Admin</button>':"";
+  $("drawer").innerHTML=
+    '<div class="dh"><div class="logo"><svg viewBox="0 0 24 24"><path d="M4 3.5v17a1 1 0 0 0 1.5.86l14-8.5a1 1 0 0 0 0-1.72l-14-8.5A1 1 0 0 0 4 3.5z"/></svg>LUXOR <span>CINEMA</span></div><button class="ibtn" data-act="closeDrawer" aria-label="Yopish">'+ic("close")+'</button></div>'+
+    '<button class="dl" data-act="go" data-arg="home">'+ic("home")+'Bosh sahifa</button>'+
+    '<button class="dl" data-act="go" data-arg="fav">'+ic("heart")+'Sevimlilar</button>'+
+    '<button class="dl" data-act="go" data-arg="movies">'+ic("film")+'Kinolar</button>'+
+    '<button class="dl" data-act="go" data-arg="series">'+ic("tv")+'Seriallar</button>'+
+    '<button class="dl" data-act="go" data-arg="dorama">'+ic("dorama")+'Doramalar</button>'+
+    '<button class="dl" data-act="go" data-arg="anime">'+ic("anime")+'Anime</button>'+
+    '<button class="dl" data-act="go" data-arg="top">'+ic("trophy")+'TOP 10</button>'+
+    '<div class="acc" id="accGen"><button class="dl" data-act="acc" data-arg="accGen">'+ic("grid")+'Janrlar'+ic("chev").replace('class="i"','class="i chev"')+'</button><div class="dsub">'+gens+'</div></div>'+
+    '<button class="dl" data-act="go" data-arg="shop">'+ic("crown")+'VIP / Do\'kon</button>'+
+    '<button class="dl" data-act="soon">'+ic("clock")+'Tez orada</button>'+
+    '<button class="dl" data-act="go" data-arg="profile">'+ic("user")+'Profil</button>'+admin+
+    '<div class="dsep"></div>'+
+    '<button class="dl" data-act="theme">'+ic(S.theme==="dark"?"sun":"moon")+(S.theme==="dark"?"Kunduzgi ko'rinish":"Tungi ko'rinish")+'</button>'+
+    '<button class="dl" data-act="contact">'+ic("mail")+'Bog\'lanish</button>';
+}
+function closeDrawer(){ $("drawer").classList.remove("on"); $("ovDrawer").classList.remove("on"); syncBack(); }
+
+/* ====================================================== BOSH SAHIFA */
+function storiesList(){
+  var l=S.movies.slice();
+  if(S.storyTab==="new") return l.slice(0,20);
+  if(S.storyTab==="views") return l.sort(function(a,b){return (b.views||0)-(a.views||0);}).slice(0,20);
+  if(!S.shuf||S.shuf.length!==l.length){ S.shuf=l.slice().sort(function(){return Math.random()-.5;}); }
+  return S.shuf.slice(0,20);
+}
+function storiesHTML(){
+  if(!S.movies.length) return "";
+  return '<div class="story-tabs"><div class="seg" id="storySeg">'+
+    [["random","Tasodifiy"],["new","Yangi"],["views","Ko'p ko'rilgan"]].map(function(t){ return '<button data-act="story" data-arg="'+t[0]+'" class="'+(S.storyTab===t[0]?"on":"")+'">'+t[1]+'</button>'; }).join("")+
+    '</div></div><div class="stories" id="stories">'+storyItems()+'</div>';
+}
+function storyItems(){
+  return storiesList().map(function(m){ return '<button class="st" data-open="'+esc(m.code)+'" data-kind="movie"><div class="ring"><div style="--h:'+hue(m.title)+'">'+(m.poster_url?'<img loading="lazy" alt="" src="'+esc(m.poster_url)+'" onerror="this.remove()">':"")+'</div></div><span class="n">'+esc(m.title)+'</span></button>'; }).join("");
+}
+function heroHTML(){
+  var l=S.movies.slice(0,5); if(!l.length) return "";
+  return '<section class="sec" style="padding-top:16px"><div class="hero-track" id="heroTrack">'+l.map(function(m){
+    return '<div class="slide" data-open="'+esc(m.code)+'" data-kind="movie" style="--h:'+hue(m.title)+'"><div class="fb"></div>'+(m.poster_url?'<img alt="" src="'+esc(m.poster_url)+'" onerror="this.remove()">':"")+
+      '<div class="in"><div class="kick">🆕 So\'nggi yuklangan</div><h3>'+esc(m.title)+'</h3><div class="row"><span class="btn sm">'+ic("play")+'Tomosha qilish</span>'+(m.is_vip?'<span class="tag vip">VIP</span>':"")+'</div></div></div>';
+  }).join("")+'</div><div class="dots" id="heroDots">'+l.map(function(_,i){return '<i class="'+(i===0?"on":"")+'"></i>';}).join("")+'</div></section>';
+}
+function initHero(){
+  clearInterval(S.heroTimer);
+  var tr=$("heroTrack"); if(!tr||!tr.firstElementChild) return;
+  var dots=[].slice.call(document.querySelectorAll("#heroDots i")), n=dots.length;
+  function step(){ return tr.firstElementChild.offsetWidth+10; }
+  function idx(){ return Math.round(tr.scrollLeft/step()); }
+  tr.addEventListener("scroll",function(){ requestAnimationFrame(function(){ var i=idx(); dots.forEach(function(d,k){ d.classList.toggle("on",k===i); }); }); },{passive:true});
+  if(n>1&&!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)){
+    S.heroTimer=setInterval(function(){ if(document.hidden||S.view!=="home") return; var i=(idx()+1)%n; tr.scrollTo({left:i*step(),behavior:"smooth"}); },5000);
+    tr.addEventListener("touchstart",function(){ clearInterval(S.heroTimer); },{passive:true});
+  }
+}
+function quickHTML(){
+  var t=[["search","Qidirish","search","var(--ac)"],["roulette","Kino ruletka","dice","var(--blue)"],["top","TOP 10","trophy","var(--ac)"],
+         ["shop","VIP / Do'kon","crown","var(--gold)"],["fav","Saqlanganlar","heart","var(--red)"],["soon","Tez orada","clock","var(--blue)"],
+         ["genres","Janrlar","grid","var(--ac)"],["bonus","Kunlik bonus","gift","var(--gold)"],["invite","Do'st taklif","users","var(--blue)"]];
+  return '<section class="sec"><div class="sec-h"><h2>Tezkor bo\'limlar</h2></div><div class="qa">'+t.map(function(x){
+    return '<button data-act="q_'+x[0]+'"><span class="ico" style="--c:'+x[3]+'">'+ic(x[2])+'</span>'+x[1]+'</button>'; }).join("")+'</div></section>';
+}
+function genreRowHTML(){
+  var l=S.gen.list.slice().sort(function(a,b){ return ((S.gen.counts[b]||0)>0)-((S.gen.counts[a]||0)>0); });
+  return '<section class="sec"><div class="sec-h"><h2>Janrlar</h2><button data-act="q_genres">Hammasi</button></div><div class="gen-row">'+l.map(function(g){
+    var c=S.gen.counts[g]||0;
+    return '<button class="gen'+(c?"":" none")+'" data-act="genre" data-arg="'+esc(g)+'"><div class="g">'+gIcon(g)+(c?'<b>'+c+'</b>':"")+'</div>'+esc(g)+'</button>'; }).join("")+'</div></section>';
+}
+function top10HTML(){
+  if(!S.top.length) return "";
+  return '<section class="sec"><div class="sec-h"><div><div class="lbl" style="color:var(--ac)">Real vaqt reytingi</div><h2 style="margin-top:2px">TOP 10</h2></div><button data-act="go" data-arg="top">Barchasi</button></div><div class="t10">'+
+    S.top.map(function(m,i){ return '<div class="it"><div class="n">'+(i+1)+'</div>'+cardHTML(m,"movie")+'</div>'; }).join("")+'</div></section>';
+}
+function soonRowHTML(){
+  if(!S.soon.length) return "";
+  return '<section class="sec"><div class="sec-h"><h2>Tez orada</h2><button data-act="go" data-arg="shop">Barchasi</button></div><div class="row-h">'+S.soon.slice(0,10).map(function(it){
+    return '<div class="card" data-act="soon"><div class="poster" style="--h:'+hue(it.title)+'">'+posterInner(it)+'<span class="ep">'+(it.expected_date?esc(it.expected_date):"Tez orada")+'</span></div><div class="cm"><h4>'+esc(it.title)+'</h4><p><span>'+esc(firstGenre(it.genre))+'</span><span>🔔</span></p></div></div>'; }).join("")+'</div></section>';
+}
+function seenRowHTML(){
+  var l=store.get("seen",[]).map(function(c){ return findItem(c,"movie"); }).filter(Boolean).slice(0,10);
+  return rowHTML("Yaqinda ko'rganlaringiz",l,"movie",null);
+}
+function renderHome(){
+  var v=$("v-home"), h="";
+  if(S.demo) h+='<div class="note">Serverga ulanib bo\'lmadi — namuna ma\'lumotlar ko\'rsatilmoqda.</div>';
+  if(!S.movies.length&&!S.loaded){ v.innerHTML='<div class="sec"><div class="grid">'+skelHTML(6)+'</div></div>'; return; }
+  h+=storiesHTML()+heroHTML()+quickHTML()+seenRowHTML()+top10HTML()+genreRowHTML();
+  var rest=S.movies.slice(5,17);
+  h+=rowHTML("Eng yangilari",rest,"movie",["go","movies"]);
+  var gl=S.gen.list.filter(function(g){ return g!=="Dorama"&&g!=="Anime"&&(S.gen.counts[g]||0)>=3; }).sort(function(a,b){return S.gen.counts[b]-S.gen.counts[a];}).slice(0,3);
+  gl.forEach(function(g){ h+=rowHTML(gIcon(g)+" "+esc(g),S.movies.filter(function(m){return genresOf(m.genre).indexOf(g)>-1;}).slice(0,12),"movie",["genre",g]); });
+  h+=rowHTML("💎 VIP kinolar",S.movies.filter(function(m){return m.is_vip;}).slice(0,12),"movie",null);
+  h+=rowHTML("Seriallar",S.series.slice(0,12),"series",["go","series"]);
+  h+=mixRow("🎎 Doramalar","Dorama","dorama")+mixRow("🌸 Anime","Anime","anime");
+  h+=soonRowHTML();
+  if(!S.movies.length) h+='<div class="grid"><div class="empty"><div class="e">🎬</div><p>Kinolar hali qo\'shilmagan</p><span>Tez orada yangi kinolar paydo bo\'ladi</span></div></div>';
+  v.innerHTML=h; initHero();
+}
+
+/* ====================================================== KATALOG (kinolar / seriallar) */
+function catChips(kind){
+  var C=S.cat[kind], counts=kind==="movies"?S.gen.counts:S.gen.sc;
+  var html='<button class="chip'+(C.genre?"":" on")+'" data-act="cgenre" data-kind="'+kind+'" data-arg="">Barchasi</button>';
+  S.gen.list.forEach(function(g){ var c=counts[g]||0; html+='<button class="chip'+(C.genre===g?" on":"")+'" data-act="cgenre" data-kind="'+kind+'" data-arg="'+esc(g)+'">'+gIcon(g)+' '+esc(g)+(c?'<small>'+c+'</small>':"")+'</button>'; });
+  return html;
+}
+function renderCatalog(kind){
+  var C=S.cat[kind], v=$("v-"+kind);
+  var sorts=kind==="movies"?[["new","Yangi"],["views","Ko'p ko'rilgan"],["rating","Reyting"]]:null;
+  v.innerHTML='<div class="sec" style="padding-top:8px"><div class="sec-h"><h2>'+(kind==="movies"?"Kinolar":"Seriallar")+(C.genre?' · '+esc(C.genre):"")+'</h2><div style="display:flex;gap:16px">'+(C.genre?'<button data-act="csub" data-arg="'+esc(C.genre)+'">'+(S.gen.sub.indexOf(C.genre)>-1?"🔔 Obuna":"🔕 Obuna")+'</button>':"")+'<button data-act="q_genres" data-kind="'+kind+'">Janrlar</button></div></div>'+
+    '<div class="chips" id="cc-'+kind+'">'+catChips(kind)+'</div>'+
+    (sorts?'<div style="padding:12px 14px 4px"><div class="seg">'+sorts.map(function(s){ return '<button data-act="csort" data-kind="'+kind+'" data-arg="'+s[0]+'" class="'+(C.sort===s[0]?"on":"")+'">'+s[1]+'</button>'; }).join("")+'</div></div>':"")+
+    '</div><div class="grid" id="cg-'+kind+'" style="margin-top:12px"></div><div style="padding:14px" id="cm-'+kind+'"></div>';
+  var sc=document.querySelector("#cc-"+kind+" .chip.on"); if(sc&&sc.scrollIntoView) try{ sc.scrollIntoView({inline:"center",block:"nearest"}); }catch(e){}
+  loadCatalog(kind,true);
+}
+function loadCatalog(kind,reset){
+  var C=S.cat[kind]; if(C.busy&&!reset) return;
+  var tok=C.tok=(C.tok||0)+1;
+  if(reset){ C.items=[]; C.off=0; C.more=false; }
+  C.busy=true;
+  var grid=$("cg-"+kind); if(reset&&grid) grid.innerHTML=skelHTML(6);
+  var ep=kind==="movies"?"/api/movies-list":"/api/series-list";
+  api(ep,{genre:C.genre,q:C.q||"",sort:C.sort,limit:PAGE,offset:C.off}).then(function(r){
+    if(tok!==C.tok) return;
+    C.busy=false;
+    grid=$("cg-"+kind); if(!grid) return;
+    if(!r.ok){ grid.innerHTML='<div class="empty"><div class="e">⚠️</div><p>Yuklashda xatolik</p><span>Birozdan so\'ng qayta urinib ko\'ring</span></div>'; return; }
+    var list=kind==="movies"?r.movies:r.series;
+    remember(list,kind==="movies"?"movie":"series");
+    C.items=C.items.concat(list); C.off=C.items.length; C.more=!!r.has_more;
+    grid.innerHTML=C.items.length?C.items.map(function(m){ return cardHTML(m,kind==="movies"?"movie":"series"); }).join(""):
+      '<div class="empty"><div class="e">'+(C.q?"🔍":(C.genre?gIcon(C.genre):"🎬"))+'</div><p>'+(C.q?"\""+esc(C.q)+"\" topilmadi":(C.genre?esc(C.genre)+" janrida hali "+(kind==="movies"?"kino":"serial")+" yo'q":"Hali hech narsa yo'q"))+'</p><span>Boshqa janrni tanlab ko\'ring</span></div>';
+    var mb=$("cm-"+kind); if(mb) mb.innerHTML=C.more?'<button class="btn gh full" data-act="cmore" data-kind="'+kind+'">Yana ko\'rsatish</button>':"";
+  });
+}
+
+
+/* ====================================================== DORAMA / ANIME BO'LIMLARI */
+var SEC={
+  dorama:{genre:"Dorama",title:"Doramalar",icon:"🎎"},
+  anime:{genre:"Anime",title:"Anime",icon:"🌸"}
+};
+S.sec={dorama:{type:"all",q:"",tok:0},anime:{type:"all",q:"",tok:0}};
+var SECTIONS=["movies","series","dorama","anime"];
+function setPh(v){
+  var t={movies:"Kinolar ichidan qidirish...",series:"Seriallar ichidan qidirish...",dorama:"Doramalar ichidan qidirish...",anime:"Anime ichidan qidirish..."}[v]||"Kino yoki serial qidirish...";
+  $("q").placeholder=t;
+}
+function secList(g){
+  var o=[];
+  S.movies.forEach(function(m){ if(genresOf(m.genre).indexOf(g)>-1) o.push({m:m,k:"movie"}); });
+  S.series.forEach(function(m){ if(genresOf(m.genre).indexOf(g)>-1) o.push({m:m,k:"series"}); });
+  return o;
+}
+function mixRow(title,g,view){
+  var l=secList(g).slice(0,12); if(!l.length) return "";
+  return '<section class="sec"><div class="sec-h"><h2>'+title+'</h2><button data-act="go" data-arg="'+view+'">Barchasi</button></div><div class="row-h">'+
+    l.map(function(x){ return cardHTML(x.m,x.k); }).join("")+
+    '<button class="more-card" data-act="go" data-arg="'+view+'">'+ic("grid")+'Barchasini ko\'rish</button></div></section>';
+}
+function renderSection(k){
+  var Z=SEC[k], C=S.sec[k], v=$("v-"+k);
+  var types=[["all","Hammasi"],["movie","Kinolar"],["series","Seriallar"]];
+  v.innerHTML='<div class="sec" style="padding-top:8px"><div class="sec-h"><h2>'+Z.icon+' '+Z.title+'</h2><button data-act="csub" data-arg="'+esc(Z.genre)+'">'+(S.gen.sub.indexOf(Z.genre)>-1?"🔔 Obuna":"🔕 Obuna")+'</button></div>'+
+    '<div style="padding:4px 14px 0"><div class="seg">'+types.map(function(t){ return '<button data-act="stype" data-kind="'+k+'" data-arg="'+t[0]+'" class="'+(C.type===t[0]?"on":"")+'">'+t[1]+'</button>'; }).join("")+'</div></div></div>'+
+    '<div class="grid" id="sg-'+k+'" style="margin-top:12px"></div>';
+  loadSection(k);
+}
+function loadSection(k){
+  var Z=SEC[k], C=S.sec[k], tok=C.tok=C.tok+1, grid=$("sg-"+k);
+  if(grid) grid.innerHTML=skelHTML(6);
+  var body={genre:Z.genre,q:C.q||"",limit:200};
+  var pm=C.type==="series"?Promise.resolve(null):api("/api/movies-list",body);
+  var ps=C.type==="movie"?Promise.resolve(null):api("/api/series-list",body);
+  Promise.all([pm,ps]).then(function(rs){
+    if(tok!==C.tok) return;
+    grid=$("sg-"+k); if(!grid) return;
+    if((rs[0]&&!rs[0].ok)&&(rs[1]&&!rs[1].ok)||(rs[0]&&!rs[0].ok&&!rs[1])||(rs[1]&&!rs[1].ok&&!rs[0])){
+      grid.innerHTML='<div class="empty"><div class="e">⚠️</div><p>Yuklashda xatolik</p><span>Birozdan so\'ng qayta urinib ko\'ring</span></div>'; return; }
+    var m=rs[0]&&rs[0].ok?rs[0].movies:[], s=rs[1]&&rs[1].ok?rs[1].series:[];
+    remember(m,"movie"); remember(s,"series");
+    var all=m.map(function(x){ return {m:x,k:"movie"}; }).concat(s.map(function(x){ return {m:x,k:"series"}; }));
+    all.sort(function(a,b){ return String(b.m.added_at||"").localeCompare(String(a.m.added_at||"")); });
+    grid.innerHTML=all.length?all.map(function(x){ return cardHTML(x.m,x.k); }).join(""):
+      '<div class="empty"><div class="e">'+(C.q?"🔍":Z.icon)+'</div><p>'+(C.q?"\""+esc(C.q)+"\" topilmadi":Z.title+" hali qo'shilmagan")+'</p><span>'+(C.q?"Boshqa nom bilan izlab ko'ring":"Tez orada yangilari paydo bo'ladi")+'</span></div>';
+  });
+}
+function reloadSection(v){ if(v==="movies"||v==="series") loadCatalog(v,true); else loadSection(v); }
+
+/* ====================================================== QIDIRUV */
+var searchTimer;
+function renderSearch(){
+  var v=$("v-search"), q=S.q;
+  if(!q){
+    var rec=store.get("recent",[]);
+    v.innerHTML='<div class="sec" style="padding-top:8px">'+
+      (rec.length?'<div class="sec-h"><h2>So\'nggi qidiruvlar</h2><button data-act="clearRecent">Tozalash</button></div><div class="chips">'+rec.map(function(x){return '<button class="chip" data-act="doq" data-arg="'+esc(x)+'">'+esc(x)+'</button>';}).join("")+'</div>':"")+
+      '<div class="sec-h" style="padding-top:18px"><h2>Janr bo\'yicha izlash</h2></div><div class="chips">'+S.gen.list.map(function(g){ return '<button class="chip" data-act="genre" data-arg="'+esc(g)+'">'+gIcon(g)+' '+esc(g)+'</button>'; }).join("")+'</div></div>'+
+      rowHTML("Ko'p ko'rilganlar",S.movies.slice().sort(function(a,b){return (b.views||0)-(a.views||0);}).slice(0,10),"movie",null);
+    return;
+  }
+  v.innerHTML='<div class="sec" style="padding-top:8px"><div class="sec-h"><h2>"'+esc(q)+'" bo\'yicha</h2></div><div class="grid" id="sr">'+skelHTML(4)+'</div></div><div id="sr2"></div>';
+  Promise.all([api("/api/movies-list",{q:q,limit:40}),api("/api/series-list",{q:q,limit:40})]).then(function(rs){
+    if(S.q!==q||S.view!=="search") return;
+    var m=rs[0].ok?rs[0].movies:[], s=rs[1].ok?rs[1].series:[];
+    remember(m,"movie"); remember(s,"series");
+    var g=$("sr"); if(!g) return;
+    if(!m.length&&!s.length){ g.innerHTML='<div class="empty"><div class="e">🔍</div><p>Hech narsa topilmadi</p><span>Boshqa nom bilan izlab ko\'ring</span></div>'; return; }
+    g.innerHTML=m.map(function(x){return cardHTML(x,"movie");}).join("")||"";
+    if(!m.length) g.style.display="none";
+    $("sr2").innerHTML=s.length?'<div class="sec"><div class="sec-h"><h2>Seriallar</h2></div><div class="grid">'+s.map(function(x){return cardHTML(x,"series");}).join("")+'</div></div>':"";
+  });
+}
+function runSearch(q){
+  S.q=(q||"").trim();
+  if(S.view!=="search") go("search",{keepScroll:true}); else renderSearch();
+}
+
+/* ====================================================== TOP / SEVIMLILAR */
+function renderTop(){
+  var v=$("v-top"); v.innerHTML='<div class="sec" style="padding-top:8px"><div class="sec-h"><h2>🏆 TOP-10 kino</h2></div><div class="mon" style="padding:0" id="topList"><p class="gp" style="padding:14px">Yuklanmoqda...</p></div></div>';
+  api("/api/top-movies",{}).then(function(r){
+    var host=$("topList"); if(!host) return;
+    if(!r.ok||!r.movies.length){ host.innerHTML='<p class="gp" style="padding:14px">Hozircha ma\'lumot yo\'q.</p>'; return; }
+    S.top=r.movies; remember(r.movies,"movie");
+    host.innerHTML=r.movies.map(function(m,i){ return '<div class="toprow" data-open="'+esc(m.code)+'" data-kind="movie"><div class="rk">'+(i+1)+'</div><div class="th" style="--h:'+hue(m.title)+'">'+(m.poster_url?'<img loading="lazy" alt="" src="'+esc(m.poster_url)+'" onerror="this.remove()">':"")+'</div><div class="in"><b>'+esc(m.title)+'</b><span>'+esc(firstGenre(m.genre))+'</span></div><div class="vw">'+fmtN(m.views)+' 👁</div></div>'; }).join("");
+  });
+}
+function renderFav(){
+  var v=$("v-fav"); v.innerHTML='<div class="sec" style="padding-top:8px"><div class="sec-h"><h2>❤️ Sevimlilar</h2></div><div class="grid" id="favGrid">'+skelHTML(4)+'</div></div>';
+  api("/api/favorites-list",{}).then(function(r){
+    var g=$("favGrid"); if(!g) return;
+    if(!r.ok){ g.innerHTML='<div class="empty"><div class="e">⚠️</div><p>Yuklashda xatolik</p></div>'; return; }
+    S.fav={}; (r.favorites||[]).forEach(function(f){ S.fav[f.code]=true; });
+    remember(r.favorites,"movie");
+    g.innerHTML=(r.favorites||[]).length?r.favorites.map(function(m){return cardHTML(m,"movie");}).join(""):'<div class="empty"><div class="e">❤️</div><p>Hali sevimli kino yo\'q</p><span>Kino kartasidagi ♥ tugmasini bosing</span></div>';
+  });
+}
+
+/* ====================================================== KINO/SERIAL SAHIFASI (sheet) */
+function findItem(code,kind){
+  var k=kind==="series"?"series":"movie";
+  return S.cache[k+":"+code]||null;
+}
+function openDetail(code,kind){
+  kind=kind==="series"?"series":"movie";
+  var it=findItem(code,kind);
+  if(it){ renderDetail(it,kind); return; }
+  api(kind==="series"?"/api/series-list":"/api/movies-list",{code:code}).then(function(r){
+    var l=r.ok?(kind==="series"?r.series:r.movies):[];
+    if(!l.length){ toast("Topilmadi","err"); return; }
+    remember(l,kind); renderDetail(l[0],kind);
+  });
+}
+function renderDetail(m,kind){
+  var isS=kind==="series", sh=$("sheet");
+  if(!isS){ var seen=store.get("seen",[]).filter(function(c){ return c!==m.code; }); seen.unshift(m.code); store.set("seen",seen.slice(0,12)); }
+  var price=m.is_vip?'<span class="tag vip">💎 VIP</span>':(m.price_stars?'<span class="tag price">⭐ '+m.price_stars+'</span>':"");
+  var gens=genresOf(m.genre).map(function(g){ return '<button data-act="genre" data-arg="'+esc(g)+'">'+gIcon(g)+' '+esc(g)+'</button>'; }).join("");
+  var meta=isS?'<span>'+ic("tv")+(m.episode_count||0)+' qism</span>':'<span>'+ic("star")+(m.rating_count>0?m.avg_rating+" ("+m.rating_count+")":"Baholanmagan")+'</span><span>👁 '+fmtN(m.views)+'</span>';
+  var sim=(isS?S.series:S.movies).filter(function(x){ return x.code!==m.code&&genresOf(x.genre).some(function(g){ return genresOf(m.genre).indexOf(g)>-1; }); }).slice(0,10);
+  var eps="";
+  if(isS){ var n=m.episode_count||0; for(var i=1;i<=n;i++) eps+='<div class="epitem"><button class="epplay" data-act="epplay" data-code="'+esc(m.code)+'" data-arg="'+i+'">▶️ '+i+'-qism</button><button class="epsend" data-act="epsend" data-code="'+esc(m.code)+'" data-arg="'+i+'" title="Botga fayl sifatida yuborish">'+ic("send")+'</button></div>';
+    eps='<div class="cmt" style="margin-top:16px"><div class="lbl">📺 Qismni tanlang (▶️ onlayn ko\'rish, '+ic("send")+' botga yuborish)</div>'+(n?'<div class="epgrid">'+eps+'</div>':'<p class="gp">Bu serialda hali qismlar yo\'q</p>')+'</div>'; }
+  var actions=isS?"":
+    '<div class="dact"><button class="btn" data-act="play" data-arg="'+esc(m.code)+'">'+ic("play")+'Tomosha qilish</button><button class="btn gh" data-act="deliver" data-arg="'+esc(m.code)+'">'+ic("send")+'Botga yuborish</button></div>'+
+    '<div class="dact2"><button data-act="dfav" data-arg="'+esc(m.code)+'" class="'+(S.fav[m.code]?"on":"")+'" id="dFav">'+ic("heart")+'<span>'+(S.fav[m.code]?"Saqlangan":"Saqlash")+'</span></button>'+
+    '<button data-act="cmts" data-arg="'+esc(m.code)+'" data-kind="movie">'+ic("chat")+'Izohlar</button>'+
+    '<button data-act="rate" data-arg="'+esc(m.code)+'">'+ic("star")+'Baholash</button>'+
+    '<button data-act="share" data-arg="'+esc(m.code)+'">'+ic("share")+'Ulashish</button></div><div id="dRate"></div>';
+  sh.innerHTML='<div class="dhero" style="--h:'+hue(m.title)+'">'+(m.poster_url?'<img class="bgi" alt="" src="'+esc(m.poster_url)+'" onerror="this.remove()">':"")+
+    '<button class="ibtn dback" data-act="closeSheet" aria-label="Orqaga">'+ic("back")+'</button><div class="pp"><div class="poster" style="--h:'+hue(m.title)+'">'+posterInner(m)+'</div></div></div>'+
+    '<div class="dbody"><h1>'+esc(m.title)+'</h1><div class="dmeta">'+meta+(price?'<span>'+price+'</span>':"")+'</div>'+(gens?'<div class="dgen">'+gens+'</div>':"")+
+    (m.description?'<p class="ddesc">'+esc(m.description)+'</p>':"")+actions+
+    (isS?eps+'<div class="dact2" style="grid-template-columns:1fr 1fr"><button data-act="cmts" data-arg="'+esc(m.code)+'" data-kind="series">'+ic("chat")+'Izohlar</button><button data-act="share" data-arg="'+esc(m.code)+'">'+ic("share")+'Ulashish</button></div>':"")+
+    '<div id="dCmts"></div>'+(sim.length?'<div style="margin:22px -16px 0">'+rowHTML("O'xshash "+(isS?"seriallar":"kinolar"),sim,kind,null)+'</div>':"")+'</div>';
+  sh.scrollTop=0; S.sheet="detail"; sh.classList.add("on"); document.body.style.overflow="hidden"; syncBack();
+}
+function closeSheets(silent){
+  ["sheet","gsheet"].forEach(function(id){ $(id).classList.remove("on"); });
+  S.sheet=null; document.body.style.overflow=""; if(!silent) syncBack();
+}
+function refreshCards(){
+  document.querySelectorAll(".favb").forEach(function(b){ b.classList.toggle("on",!!S.fav[b.dataset.fav]); });
+}
+function toggleFav(code,btn){
+  hap("light");
+  api("/api/favorite-toggle",{code:code}).then(function(r){
+    if(!r.ok) return;
+    S.fav[code]=r.added; refreshCards();
+    var d=$("dFav"); if(d&&d.dataset.arg===code){ d.classList.toggle("on",r.added); d.querySelector("span").textContent=r.added?"Saqlangan":"Saqlash"; }
+    toast(r.added?"❤️ Sevimlilarga qo'shildi":"Sevimlilardan olib tashlandi");
+    if(S.view==="fav") renderFav();
+  });
+}
+
+/* ====================================================== YETKAZISH / PLEER / IZOHLAR */
+function sendMovieCode(code){
+  var isEp=code.indexOf(":")!==-1, ep=isEp?"/api/deliver-episode":"/api/deliver-movie", body;
+  if(isEp){ var p=code.split(":"); body={code:p[0],episode:parseInt(p[1],10)}; } else body={code:code};
+  toast("⏳ Yuborilmoqda...");
+  api(ep,body).then(function(r){
+    if(r.ok){ toast("🎬 Botga yuborildi — chatga qayting"); hap("medium"); setTimeout(function(){ try{ if(tg&&tg.close) tg.close(); }catch(e){} },1100); }
+    else toast(r.message||"Xatolik yuz berdi, birozdan so'ng qayta urinib ko'ring","err");
+  });
+}
+function openPlayer(code,ep){
+  toast("⏳ Video tayyorlanmoqda...");
+  var body=ep?{code:code,episode:ep}:{code:code};
+  api("/api/stream-token",body).then(function(r){
+    if(!r.ok){ toast(r.message||"Onlayn ko'rish mavjud emas","err"); return; }
+    var m=$("modal");
+    m.innerHTML='<div class="mbox"><div class="mh"><span>▶️ Onlayn ko\'rish</span><button data-act="closeModal">✕ Yopish</button></div><video src="'+esc(r.url)+'" controls autoplay playsinline></video></div>';
+    m.classList.add("on"); syncBack();
+  });
+}
+function closeModal(){ var m=$("modal"); if(!m.classList.contains("on")) return; m.classList.remove("on"); m.innerHTML=""; syncBack(); }
+function openComments(code,kind){
+  var host=$("dCmts"); if(!host) return;
+  if(host.firstChild){ host.innerHTML=""; return; }
+  host.innerHTML='<div class="cmt"><div class="lbl">💬 Izohlar</div><div id="cmList"><p class="gp">Yuklanmoqda...</p></div><div class="cmt-in"><input class="inp" id="cmInput" placeholder="Fikringizni yozing..."><button id="cmSend" aria-label="Yuborish">➤</button></div></div>';
+  function refresh(){ api("/api/comments-list",{code:code,kind:kind}).then(function(r){ var h=$("cmList"); if(!h) return;
+    h.innerHTML=(!r.ok||!r.comments.length)?'<p class="gp">Hali izoh yo\'q. Birinchi bo\'ling!</p>':r.comments.map(function(c){ return '<div class="cmt-row"><b>'+esc(c.username)+'</b><p>'+esc(c.text)+'</p></div>'; }).join(""); }); }
+  refresh();
+  $("cmSend").onclick=function(){ var t=$("cmInput").value.trim(); if(!t) return; hap("light");
+    api("/api/comment-add",{code:code,kind:kind,text:t}).then(function(r){ if(r.ok){ $("cmInput").value=""; refresh(); } else toast(r.message||"Xatolik","err"); }); };
+}
+function openRate(code){
+  var h=$("dRate"); if(!h) return;
+  if(h.firstChild){ h.innerHTML=""; return; }
+  h.innerHTML='<div class="stars">'+[1,2,3,4,5].map(function(i){ return '<button data-act="star" data-code="'+esc(code)+'" data-arg="'+i+'" aria-label="'+i+' yulduz">★</button>'; }).join("")+'</div>';
+}
+function shareItem(code){
+  var it=findItem(code,"movie")||findItem(code,"series"); var t=it?it.title:"Kino";
+  if(!S.bot){ toast("Havola tayyorlanmoqda, qayta urinib ko'ring","err"); return; }
+  var link="https://t.me/"+S.bot+"?start=movie_"+code;
+  var url="https://t.me/share/url?url="+encodeURIComponent(link)+"&text="+encodeURIComponent("🎬 "+t+" — Luxor Cinema");
+  if(tg&&tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url,"_blank");
+}
+
+/* ====================================================== JANRLAR (katta tanlash oynasi) */
+function openGenreSheet(kind){
+  kind=kind==="series"?"series":"movies";
+  var counts=kind==="movies"?S.gen.counts:S.gen.sc, cur=S.cat[kind].genre;
+  $("gsheet").innerHTML='<div class="gs-h"><h2>Janrni tanlang</h2><button class="ibtn" data-act="closeSheet" aria-label="Yopish">'+ic("close")+'</button></div>'+
+    '<div class="chips" style="padding-top:8px"><button class="chip'+(kind==="movies"?" on":"")+'" data-act="gkind" data-arg="movies">Kinolar</button><button class="chip'+(kind==="series"?" on":"")+'" data-act="gkind" data-arg="series">Seriallar</button></div>'+
+    '<div class="gs-grid"><button data-act="cgenre" data-kind="'+kind+'" data-arg="" class="'+(cur?"":"on")+'"><span class="em">🎞</span>Barchasi<small>hammasi</small></button>'+
+    S.gen.list.map(function(g){ var c=counts[g]||0; return '<button data-act="cgenre" data-kind="'+kind+'" data-arg="'+esc(g)+'" class="'+(c?"has":"")+(cur===g?" on":"")+'"><span class="em">'+gIcon(g)+'</span>'+esc(g)+'<small>'+(c?c+" ta":"hozircha yo'q")+'</small></button>'; }).join("")+'</div>';
+  $("gsheet").scrollTop=0; S.sheet="genres"; $("gsheet").classList.add("on"); document.body.style.overflow="hidden"; syncBack();
+}
+function pickGenre(kind,g){
+  kind=kind==="series"?"series":"movies";
+  S.cat[kind].genre=g||"";
+  go(kind);
+}
+
+/* ====================================================== DO'KON */
+function renderShop(){
+  var v=$("v-shop");
+  v.innerHTML='<div class="sec" style="padding-top:8px"><div class="sec-h"><h2>💎 VIP a\'zolik</h2></div>'+
+    VIP_PLANS.map(function(p){ return '<div class="plan"><div><div class="t">'+p.label+'</div><div class="d">'+p.desc+'</div></div><button class="btn gold sm" data-act="buy" data-kind="vip" data-arg="'+p.id+'">'+p.stars+'⭐</button></div>'; }).join("")+'</div>'+
+    '<div class="sec" id="soonSec"><div class="sec-h"><h2>🔜 Tez orada</h2></div><div id="comingSoonGrid"></div></div>'+
+    '<div class="sec"><div class="sec-h"><h2>🛍 Maxsus takliflar</h2></div><div id="productsGrid"></div></div>'+
+    '<div class="sec"><div class="sec-h"><h2>❤️ Botni qo\'llab-quvvatlash</h2></div><div class="donate">'+DONATE_OPTIONS.map(function(a){ return '<button data-act="buy" data-kind="donate" data-arg="'+a+'">'+a+'⭐</button>'; }).join("")+'</div></div>';
+  loadComingSoon(); loadProducts();
+}
+function loadComingSoon(){
+  api("/api/coming-soon-list",{}).then(function(r){
+    var host=$("comingSoonGrid"); if(!host) return;
+    if(!r.ok||!r.items.length){ host.innerHTML='<p class="gp" style="padding:0 14px">Hozircha e\'lon qilingan narsa yo\'q.</p>'; return; }
+    var w={}; (r.waiting_ids||[]).forEach(function(id){ w[id]=true; });
+    host.innerHTML=r.items.map(function(it){ var on=!!w[it.id];
+      return '<div class="cs" data-id="'+it.id+'"><div class="th" style="--h:'+hue(it.title)+'">'+(it.poster_url?'<img loading="lazy" alt="" src="'+esc(it.poster_url)+'" onerror="this.remove()">':"")+'</div><div class="in"><b>'+esc(it.title)+'</b><div>'+esc(it.genre||"")+(it.expected_date?" · "+esc(it.expected_date):"")+'</div></div><button class="btn sm '+(on?"":"gh")+'" data-act="wait" data-arg="'+it.id+'">'+(on?"🔔 Kutmoqda":"🔔 Kuting")+'</button></div>'; }).join("");
+  });
+}
+function loadProducts(){
+  api("/api/products-list",{}).then(function(r){
+    var host=$("productsGrid"); if(!host) return;
+    if(r.ok&&r.seller_username) S.seller=r.seller_username;
+    if(!r.ok||!r.products.length){ host.innerHTML='<p class="gp" style="padding:0 14px">Hozircha maxsus takliflar yo\'q.</p>'; return; }
+    host.innerHTML=r.products.map(function(p){ return '<div class="prod"><div class="em">'+esc(p.emoji||"🛍")+'</div><div class="in"><b>'+esc(p.title)+'</b>'+(p.description?'<div>'+esc(p.description)+'</div>':"")+'<div class="pr">⭐ '+p.price_stars+'</div></div><button class="btn sm" data-act="order" data-arg="'+p.id+'">Sotib olish</button></div>'; }).join("");
+  });
+}
+function buyWithStars(kind,ref){
+  hap("medium");
+  api("/api/create-invoice",{kind:kind,ref:ref}).then(function(r){
+    if(!r.ok){ toast(r.message||"Xatolik yuz berdi","err"); return; }
+    if(tg&&tg.openInvoice){ tg.openInvoice(r.link,function(st){ if(st==="paid"){ toast("✅ To'lov muvaffaqiyatli!"); loadMe(); } else if(st==="failed") toast("To'lov amalga oshmadi","err"); }); }
+    else window.open(r.link,"_blank");
+  });
+}
+function openTgLink(url){ if(tg&&tg.openTelegramLink) tg.openTelegramLink(url); else window.open(url,"_blank"); }
+
+/* ====================================================== PROFIL */
+var PSLOTS=["favs","req","checkin","stats","ref","gsub","cont","leader","achv","promo"];
+function renderProfile(){
+  var u=(tg&&tg.initDataUnsafe&&tg.initDataUnsafe.user)||{};
+  var name=[u.first_name,u.last_name].filter(Boolean).join(" ")||"Foydalanuvchi";
+  var v=$("v-profile");
+  v.innerHTML='<div class="phead"><div class="avatar">'+esc(name.charAt(0).toUpperCase())+'</div><div><div class="pname">'+esc(name)+'</div><div class="psub" id="profSub">Oddiy a\'zo</div></div></div>'+
+    PSLOTS.map(function(s){ return '<div id="p-'+s+'"></div>'; }).join("");
+  card("req",'<div class="lbl">📝 Kino topilmadimi?</div><input class="inp" id="reqTitle" placeholder="Kino nomini yozing..."><button class="btn gh full" style="margin-top:10px" data-act="req">So\'rov yuborish</button>');
+  card("checkin",'<div class="lbl">🎁 Kunlik bonus</div><div class="streak" id="streakNum">—</div><div class="gp" style="margin-top:0">kunlik streak</div><button class="btn full" style="margin-top:10px" id="checkinBtn" data-act="checkin">Bugungi belgini qo\'yish</button>');
+  card("promo",'<div class="lbl">🎟 Promo-kod</div><div class="pr-row"><input class="inp" id="promoInput" placeholder="MASALAN: SALE10"><button class="btn sm" style="height:auto" data-act="promo">Qo\'llash</button></div>');
+  loadFavCard(); loadStats(); loadRef(); loadGenreSub(); loadCont(); loadLeader(); loadAchv();
+}
+function card(slot,html){ var h=$("p-"+slot); if(h) h.innerHTML=html?'<div class="mon">'+html+'</div>':""; }
+function loadFavCard(){ api("/api/favorites-list",{}).then(function(r){ if(!r.ok) return; (r.favorites||[]).forEach(function(f){ S.fav[f.code]=true; });
+  card("favs",'<div class="lbl" style="margin-bottom:6px">❤️ Sevimlilar</div>'+((r.favorites||[]).length?r.favorites.slice(0,5).map(function(m){ return '<div class="aff" data-open="'+esc(m.code)+'" data-kind="movie" style="cursor:pointer"><span>'+esc(m.title||m.code)+'</span><span>›</span></div>'; }).join("")+'<button class="btn gh full sm" style="margin-top:10px" data-act="go" data-arg="fav">Hammasini ko\'rish</button>':'<p class="gp">Hali sevimli kino yo\'q</p>')); remember(r.favorites,"movie"); }); }
+function loadStats(){ api("/api/user-stats",{}).then(function(r){ if(!r.ok) return; S.me=r;
+  card("stats",'<div class="lbl" style="margin-bottom:2px">📊 Mening statistikam</div><div class="stat-grid"><div class="stat"><div class="n">'+r.favorites+'</div><div class="l">Sevimlilar</div></div><div class="stat"><div class="n">'+r.streak+'</div><div class="l">Streak</div></div><div class="stat"><div class="n">'+r.total_checkins+'</div><div class="l">Jami kirishlar</div></div><div class="stat"><div class="n">'+r.requests+'</div><div class="l">So\'rovlar</div></div></div>');
+  var sn=$("streakNum"); if(sn) sn.textContent=r.streak;
+  applyVip(); var sb=$("profSub"); if(sb) sb.textContent=isVip()?"VIP a'zo":"Oddiy a'zo"; }); }
+function isVip(){ return !!(S.me.vip_until&&new Date(S.me.vip_until+"Z")>new Date()); }
+function applyVip(){ var b=$("vipBadge"); b.textContent=isVip()?"💎 VIP":"Oddiy"; b.classList.toggle("on",isVip()); }
+function loadRef(){ api("/api/referral-info",{}).then(function(r){ if(!r.ok) return; setBot(r.link);
+  card("ref",'<div class="lbl">👥 Do\'st taklif qilish</div><p class="gp">Har 5 ta taklif — 3 kunlik VIP sovg\'a!</p><div class="refl">'+esc(r.link)+'</div><p class="gp">✅ Taklif qilinganlar: <b style="color:var(--ac)">'+r.count+'</b></p><button class="btn gh full" style="margin-top:10px" data-act="shareRef" data-arg="'+esc(r.link)+'">Do\'stlarga ulashish</button>'); }); }
+function setBot(link){ var m=/t\.me\/([^?\/]+)/.exec(link||""); if(m) S.bot=m[1]; }
+function loadGenreSub(){ api("/api/genres-list",{}).then(function(r){ if(!r.ok) return; applyGenres(r);
+  var sub={}; (r.subscribed||[]).forEach(function(g){ sub[g]=true; });
+  card("gsub",'<div class="lbl">🔔 Janr bildirishnomalari</div><p class="gp">Yoqtirgan janringiz bo\'yicha yangi kino/serial qo\'shilganda xabar olasiz</p><div class="gsub">'+r.genres.map(function(g){ return '<button class="'+(sub[g]?"on":"")+'" data-act="gsub" data-arg="'+esc(g)+'">'+(sub[g]?"🔔 ":"🔕 ")+gIcon(g)+" "+esc(g)+'</button>'; }).join("")+'</div>'); }); }
+function loadCont(){ api("/api/continue-watching",{}).then(function(r){ if(!r.ok||!r.items.length){ card("cont",""); return; }
+  card("cont",'<div class="lbl">▶️ Davom ettirish</div><div class="cont">'+r.items.map(function(it){ return '<div class="cc" data-act="cont" data-code="'+esc(it.code)+'" data-arg="'+(it.last_episode+1)+'"><div class="ph" style="--h:'+hue(it.title)+'">'+(it.poster_url?'<img loading="lazy" alt="" src="'+esc(it.poster_url)+'" onerror="this.remove()">':"")+'</div><div class="b"><b>'+esc(it.title)+'</b><span>'+it.last_episode+'/'+it.episode_count+'-qism ko\'rilgan</span></div></div>'; }).join("")+'</div>'); }); }
+function loadLeader(){ api("/api/referral-leaderboard",{}).then(function(r){ if(!r.ok||!r.leaders.length){ card("leader",""); return; } var md=["🥇","🥈","🥉"];
+  card("leader",'<div class="lbl">🏆 Referral liderbordi</div>'+r.leaders.map(function(l,i){ return '<div class="aff"><span>'+(md[i]||(i+1)+".")+' '+esc(l.full_name)+'</span><span>'+l.referral_count+' ta</span></div>'; }).join("")); }); }
+function loadAchv(){ api("/api/achievements-list",{}).then(function(r){ if(!r.ok||!r.achievements.length){ card("achv",""); return; }
+  card("achv",'<div class="lbl">🏅 Yutuqlar</div><div class="achv">'+r.achievements.map(function(a){ return '<div class="'+(a.earned?"earned":"")+'"><div class="e">'+a.emoji+'</div><div class="t">'+esc(a.title)+'</div></div>'; }).join("")+'</div>'); }); }
+
+/* ====================================================== ADMIN (faqat admin uchun) */
+function renderAdmin(){
+  var v=$("v-admin"); v.innerHTML='<div class="sec" style="padding-top:8px"><div class="sec-h"><h2>🛠 Admin statistikasi</h2></div><div id="adminBox"><p class="gp" style="padding:0 14px">Yuklanmoqda...</p></div></div>';
+  api("/api/admin-stats",{}).then(function(r){
+    var h=$("adminBox"); if(!h) return;
+    if(!r.ok){ h.innerHTML='<p class="gp" style="padding:0 14px">Ruxsat yo\'q.</p>'; return; }
+    h.innerHTML='<div class="mon"><div class="stat-grid" style="margin-top:0"><div class="stat"><div class="n">'+r.total_users+'</div><div class="l">Foydalanuvchi</div></div><div class="stat"><div class="n">'+r.vip_count+'</div><div class="l">VIP</div></div><div class="stat"><div class="n">'+r.total_movies+'</div><div class="l">Kino</div></div><div class="stat"><div class="n">'+r.total_series+'</div><div class="l">Serial</div></div><div class="stat"><div class="n">'+r.pending_requests+'</div><div class="l">Kutilayotgan so\'rov</div></div></div></div>'+
+      '<div class="sec-h"><h2>🏆 Top kinolar</h2></div><div class="mon" style="padding:0">'+(r.top_movies.length?r.top_movies.map(function(m,i){ return '<div class="toprow" style="cursor:default"><div class="rk">'+(i+1)+'</div><div class="in"><b>'+esc(m.title)+'</b></div><div class="vw">'+m.views+' 👁</div></div>'; }).join(""):'<p class="gp" style="padding:14px">Ma\'lumot yo\'q</p>')+'</div>';
+  });
+}
+
+/* ====================================================== KINO RULETKA */
+function roulette(){
+  if(!S.movies.length){ toast("Hozircha kinolar yo'q","err"); return; }
+  hap("medium");
+  var m=$("modal");
+  m.innerHTML='<div class="mbox"><div class="mh"><span>🎲 Kino ruletka</span><button data-act="closeModal">✕ Yopish</button></div><div class="rl"><div class="rt" id="rlT">...</div><div class="rg" id="rlG"></div><div id="rlB" style="margin-top:14px;display:grid;grid-template-columns:1fr 1fr;gap:10px"></div></div></div>';
+  m.classList.add("on"); syncBack();
+  var done=false, result=null, ticks=0, reduce=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
+  api("/api/random-movie",{}).then(function(r){ result=(r.ok&&r.movie)?r.movie:S.movies[Math.floor(Math.random()*S.movies.length)]; });
+  (function tick(){
+    if(!$("rlT")) return;
+    ticks++;
+    if(ticks>14&&result||ticks>40){ finish(); return; }
+    var x=S.movies[Math.floor(Math.random()*S.movies.length)];
+    $("rlT").textContent=x.title; $("rlG").textContent=firstGenre(x.genre);
+    setTimeout(tick,reduce?10:70+ticks*7);
+  })();
+  function finish(){
+    if(done) return; done=true;
+    var r=result||S.movies[0];
+    $("rlT").textContent=r.title; $("rlG").textContent=firstGenre(r.genre);
+    $("rlB").innerHTML='<button class="btn" data-act="rlOpen" data-arg="'+esc(r.code)+'">Ochish</button><button class="btn gh" data-act="roulette">Yana aylantirish</button>';
+    hap("medium");
+  }
+}
+
+/* ====================================================== HODISALAR */
+var A={
+  go:function(a){ go(a); },
+  drawer:function(){ $("drawer").classList.add("on"); $("ovDrawer").classList.add("on"); syncBack(); },
+  closeDrawer:closeDrawer,
+  acc:function(a){ $(a).classList.toggle("open"); },
+  theme:function(){ applyTheme(S.theme==="dark"?"light":"dark"); buildDrawer(); $("drawer").classList.add("on"); },
+  contact:function(){ openTgLink("https://t.me/"+(S.seller||SELLER_FALLBACK)); },
+  closeSheet:function(){ closeSheets(); },
+  closeModal:closeModal,
+  up:function(){ window.scrollTo({top:0,behavior:"smooth"}); },
+  story:function(a){ S.storyTab=a; document.querySelectorAll("#storySeg button").forEach(function(b){ b.classList.toggle("on",b.dataset.arg===a); }); var h=$("stories"); if(h) h.innerHTML=storyItems(); },
+  genre:function(a){ if(a==="Dorama") go("dorama"); else if(a==="Anime") go("anime"); else pickGenre("movies",a); },
+  stype:function(a,el){ var k=el.dataset.kind; S.sec[k].type=a; renderSection(k); },
+  cgenre:function(a,el){ var k=el.dataset.kind; if(S.view===k&&!S.sheet){ S.cat[k].genre=a; renderCatalog(k); } else { pickGenre(k,a); } },
+  csort:function(a,el){ var k=el.dataset.kind; S.cat[k].sort=a; renderCatalog(k); },
+  cmore:function(a,el){ loadCatalog(el.dataset.kind,false); },
+  gkind:function(a){ openGenreSheet(a); },
+  csub:function(a,el){ hap("light"); api("/api/genre-sub-toggle",{genre:a}).then(function(r){ if(!r.ok) return;
+    var i=S.gen.sub.indexOf(a); if(r.subscribed&&i<0) S.gen.sub.push(a); if(!r.subscribed&&i>-1) S.gen.sub.splice(i,1);
+    el.textContent=r.subscribed?"🔔 Obuna":"🔕 Obuna"; toast(r.subscribed?"🔔 "+a+" janriga obuna bo'ldingiz":"🔕 Obuna bekor qilindi"); }); },
+  q_search:function(){ go("search"); setTimeout(function(){ $("q").focus(); },200); },
+  q_roulette:roulette, roulette:roulette,
+  q_top:function(){ go("top"); }, q_shop:function(){ go("shop"); }, q_fav:function(){ go("fav"); },
+  q_soon:function(){ go("shop"); setTimeout(function(){ var e=$("soonSec"); if(e) e.scrollIntoView({behavior:"smooth"}); },250); },
+  soon:function(){ A.q_soon(); },
+  q_genres:function(a,el){ openGenreSheet(el&&el.dataset.kind); },
+  q_bonus:function(){ go("profile"); setTimeout(function(){ var e=$("p-checkin"); if(e) e.scrollIntoView({behavior:"smooth"}); },350); },
+  q_invite:function(){ go("profile"); setTimeout(function(){ var e=$("p-ref"); if(e) e.scrollIntoView({behavior:"smooth"}); },600); },
+  rlOpen:function(a){ closeModal(); openDetail(a,"movie"); },
+  deliver:function(a){ sendMovieCode(a); },
+  play:function(a){ openPlayer(a); },
+  ep:function(a,el){ hap("light"); sendMovieCode(el.dataset.code+":"+a); },
+  epplay:function(a,el){ hap("light"); openPlayer(el.dataset.code,parseInt(a,10)); },
+  epsend:function(a,el){ hap("light"); sendMovieCode(el.dataset.code+":"+a); },
+  cont:function(a,el){ hap("light"); sendMovieCode(el.dataset.code+":"+a); },
+  dfav:function(a){ toggleFav(a); },
+  cmts:function(a,el){ openComments(a,el.dataset.kind||"movie"); },
+  rate:function(a){ openRate(a); },
+  star:function(a,el){ hap("light"); api("/api/rate-movie",{code:el.dataset.code,rating:parseInt(a,10)}).then(function(r){ if(!r.ok){ toast(r.message||"Xatolik","err"); return; } toast("⭐ Bahoyingiz qabul qilindi ("+r.avg+" / "+r.count+" ta)"); var h=$("dRate"); if(h) h.innerHTML=""; var it=findItem(el.dataset.code,"movie"); if(it){ it.avg_rating=r.avg; it.rating_count=r.count; } }); },
+  share:function(a){ shareItem(a); },
+  shareRef:function(a){ hap("light"); openTgLink("https://t.me/share/url?url="+encodeURIComponent(a)+"&text="+encodeURIComponent("Luxor Cinema botida ajoyib kinolar bor! 🎬")); },
+  buy:function(a,el){ buyWithStars(el.dataset.kind,a); },
+  wait:function(a,el){ hap("light"); api("/api/coming-soon-wait",{id:parseInt(a,10)}).then(function(r){ if(!r.ok) return; el.textContent=r.waiting?"🔔 Kutmoqda":"🔔 Kuting"; el.classList.toggle("gh",!r.waiting); }); },
+  order:function(a){ hap("medium"); api("/api/product-order",{product_id:parseInt(a,10)}).then(function(r){ var u=(r&&r.seller_username)||S.seller||SELLER_FALLBACK; toast("🛒 Buyurtma qabul qilindi, sotuvchiga o'tkazilmoqda..."); openTgLink("https://t.me/"+u); }); },
+  req:function(){ var t=$("reqTitle").value.trim(); if(!t) return; api("/api/movie-request-add",{title:t}).then(function(r){ if(r.ok){ $("reqTitle").value=""; toast("✅ So'rov yuborildi"); } else toast(r.message||"Xatolik","err"); }); },
+  checkin:function(){ api("/api/checkin",{}).then(function(r){ if(!r.ok) return; $("streakNum").textContent=r.streak; if(r.already) toast("Bugun allaqachon belgilangan ✅"); else { hap("light"); toast(r.reward_days?("🎉 "+r.reward_days+" kun VIP sovg'a!"):"✅ Streak: "+r.streak); } $("checkinBtn").disabled=true; }); },
+  promo:function(){ var c=$("promoInput").value.trim(); if(!c) return; hap("light"); api("/api/promo-redeem",{code:c}).then(function(r){ if(r.ok){ toast("🎉 "+r.vip_days+" kunlik VIP qo'shildi!"); $("promoInput").value=""; loadStats(); } else toast(r.message||"Xatolik","err"); }); },
+  gsub:function(a,el){ hap("light"); api("/api/genre-sub-toggle",{genre:a}).then(function(r){ if(!r.ok) return; el.classList.toggle("on",r.subscribed); el.textContent=(r.subscribed?"🔔 ":"🔕 ")+gIcon(a)+" "+a; }); },
+  doq:function(a){ $("q").value=a; runSearch(a); },
+  clearRecent:function(){ store.set("recent",[]); renderSearch(); }
+};
+document.addEventListener("click",function(e){
+  var f=e.target.closest("[data-fav]");
+  if(f){ e.stopPropagation(); toggleFav(f.dataset.fav,f); return; }
+  var t=e.target.closest("[data-act]");
+  if(t){ var fn=A[t.dataset.act]; if(fn){ e.stopPropagation(); fn(t.dataset.arg,t,e); return; } }
+  var o=e.target.closest("[data-open]");
+  if(o){ hap("light"); openDetail(o.dataset.open,o.dataset.kind); }
+});
+document.addEventListener("keydown",function(e){ if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches(".card[data-open]")){ e.preventDefault(); e.target.click(); } });
+$("q").addEventListener("input",function(){ var v=this.value; clearTimeout(searchTimer); searchTimer=setTimeout(function(){
+  if(SECTIONS.indexOf(S.view)>-1){ (S.view==="movies"||S.view==="series"?S.cat[S.view]:S.sec[S.view]).q=v.trim(); reloadSection(S.view); return; }
+  if(!v.trim()){ S.q=""; if(S.view==="search") renderSearch(); return; } runSearch(v); },300); });
+$("q").addEventListener("keydown",function(e){ if(e.key==="Enter"){ e.preventDefault(); var v=this.value.trim(); if(v){ var r=store.get("recent",[]).filter(function(x){return x!==v;}); r.unshift(v); store.set("recent",r.slice(0,8)); } this.blur(); } });
+$("q").addEventListener("focus",function(){ if(S.view!=="search"&&S.view!=="home") return; });
+document.addEventListener("visibilitychange",function(){
+  if(!document.hidden&&Date.now()-S.lastLoad>90000&&!S.sheet){ loadBulk(); loadMeta(); }
+});
+window.addEventListener("scroll",function(){ $("fab").classList.toggle("on",window.scrollY>700); },{passive:true});
+
+/* ====================================================== TEMA */
+function applyTheme(t){
+  S.theme=t; document.documentElement.setAttribute("data-theme",t); store.set("theme",t);
+  var c=t==="dark"?"#070b11":"#f3f6fb"; var m=document.querySelector('meta[name=theme-color]'); if(m) m.content=c;
+  try{ if(tg){ if(tg.setHeaderColor) tg.setHeaderColor(c); if(tg.setBackgroundColor) tg.setBackgroundColor(c); } }catch(e){}
+}
+
+/* ====================================================== MA'LUMOT YUKLASH */
+function applyGenres(r){
+  S.gen={list:(r.genres&&r.genres.length)?r.genres:FALLBACK_GENRES, icons:r.icons||{}, counts:r.counts||{}, sc:r.series_counts||{}, sub:r.subscribed||[]};
+}
+function loadMe(){ return api("/api/user-stats",{}).then(function(r){ if(r.ok){ S.me=r; applyVip(); buildDrawer(); } }); }
+function loadBulk(){
+  var cached=store.get("bulk",null);
+  if(cached&&cached.length){ S.movies=cached; remember(cached,"movie"); S.loaded=true; if(S.view==="home") renderHome(); }
+  return Promise.all([api("/api/movies-list",{limit:120}),api("/api/series-list",{limit:60})]).then(function(rs){
+    S.loaded=true; S.lastLoad=Date.now();
+    if(rs[0].ok){ S.movies=rs[0].movies; remember(S.movies,"movie"); store.set("bulk",S.movies.slice(0,30)); S.demo=false; }
+    else if(!S.movies.length){ S.demo=false; }
+    if(rs[1].ok){ S.series=rs[1].series; remember(S.series,"series"); }
+    if(S.view==="home") renderHome();
+  });
+}
+function loadMeta(){
+  api("/api/genres-list",{}).then(function(r){ if(r.ok){ applyGenres(r); buildDrawer(); if(S.view==="home") renderHome(); } });
+  api("/api/favorites-list",{}).then(function(r){ if(r.ok){ (r.favorites||[]).forEach(function(f){ S.fav[f.code]=true; }); refreshCards(); } });
+  api("/api/top-movies",{}).then(function(r){ if(r.ok){ S.top=r.movies; remember(S.top,"movie"); if(S.view==="home") renderHome(); } });
+  api("/api/coming-soon-list",{}).then(function(r){ if(r.ok){ S.soon=r.items||[]; if(S.view==="home") renderHome(); } });
+  api("/api/referral-info",{}).then(function(r){ if(r.ok) setBot(r.link); });
+  api("/api/products-list",{}).then(function(r){ if(r.ok&&r.seller_username) S.seller=r.seller_username; });
+  loadMe();
+}
+
+/* ====================================================== ISHGA TUSHIRISH */
+document.getElementById("btnMenu").innerHTML=ic("menu");
+document.getElementById("icSearch").innerHTML=ic("search");
+document.getElementById("fab").innerHTML=ic("up");
+applyTheme(S.theme); buildNav(); buildDrawer();
+document.querySelectorAll("#nav button")[0].classList.add("on");
+renderHome();
+loadBulk(); loadMeta();
+
+/* /start tugmalaridagi ?focus= parametri (search, top, shop, profile, series) */
+(function(){
+  try{
+    var f=new URLSearchParams(window.location.search).get("focus"); if(!f) return;
+    var map={search:"search",top:"top",shop:"shop",profile:"profile",series:"series"};
+    if(map[f]) go(map[f]);
+    if(f==="search") setTimeout(function(){ $("q").focus(); },350);
+  }catch(e){}
+})();
+setTimeout(function(){ var sp=$("fxSplash"); if(sp){ sp.classList.add("hide"); setTimeout(function(){ sp.remove(); },450); } },500);
+</script>
+</body>
+</html>
